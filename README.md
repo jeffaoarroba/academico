@@ -31,7 +31,7 @@ venv\Scripts\activate.bat
 source venv/bin/activate
 ```
 
-a partir desse ponto (`venv` carregado) o comando pip estara disponivel
+> agora (`venv` carregado) o comando pip estara disponivel
 
 para instalar as libs (e suas dependencias) do projeto (geralmente so precisa rodar uma vez)
 
