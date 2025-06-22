@@ -1,8 +1,10 @@
 ## GIT
 
+```bash
 git add .
 git commit -m "resumo da alteracao aqui"
 git push (enviar os commits da minha maquina para o servidor git)
+```
 
 ## PYTHON
 
