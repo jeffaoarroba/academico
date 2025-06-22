@@ -49,5 +49,7 @@ para rodar o streamlite do projeto
 
 ```bash
 # acessar a pasta do projeto no terminal
-python -m streamlit run ./src/app.py
+# com o venv carregado
+streamlit run ./src/app.py
+# ou python -m streamlit run ./src/app.py
 ```
