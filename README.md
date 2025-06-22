@@ -28,6 +28,8 @@ pra carregar o ambiente virtual (a pasta `.venv` pode estar com o nome `venv` ta
 # no windows
 ```cmd
 venv\Scripts\activate.bat
+# ou
+venv\bin\activate.bat
 ```
 
 # no macOS and Linux
