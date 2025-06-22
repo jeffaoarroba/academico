@@ -18,8 +18,8 @@ python -m venv .venv
 
 precisa sempre ativar o venv (virtual environment) antes de comecar a mecher no projeto e para usar o comando `pip install`
 
-pra carregar o ambiente virtual (a pasta `.venv` pode estar com o nome `venv` tambem)  
-antes de carregar o `venv` o pip nao esta disponivel
+pra carregar o ambiente virtual (a pasta `.venv` pode estar com o nome `venv` tambem) use os comandos abaixo  
+> antes de carregar o `venv` o pip nao esta disponivel
 
 # no windows
 ```cmd
