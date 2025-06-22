@@ -1,6 +1,7 @@
 ## GIT
 
 ```bash
+# acessar a pasta do projeto no terminal
 git add .
 git commit -m "resumo da alteracao aqui"
 git push (enviar os commits da minha maquina para o servidor git)
@@ -15,6 +16,7 @@ criar o ambiente virtual (criar a pasta venv) (sem carregar o venv) (so precisa 
 quando voce instala o python, ja vem instalado o modulo/lib venv (nao precisa instalar via comando: `pip install`)
 
 ```bash
+# acessar a pasta do projeto no terminal
 python -m venv .venv
 ```
 
@@ -30,6 +32,7 @@ venv\Scripts\activate.bat
 
 # no macOS and Linux
 ```bash
+# acessar a pasta do projeto no terminal
 source venv/bin/activate
 ```
 
@@ -38,5 +41,13 @@ source venv/bin/activate
 para instalar as libs (e suas dependencias) do projeto (geralmente so precisa rodar uma vez)
 
 ```bash
+# acessar a pasta do projeto no terminal
 pip install -r ./requirements.txt
+```
+
+para rodar o streamlite do projeto
+
+```bash
+# acessar a pasta do projeto no terminal
+python -m streamlit run ./src/app.py
 ```
