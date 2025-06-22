@@ -8,6 +8,8 @@ git push (enviar os commits da minha maquina para o servidor git)
 
 ## PYTHON
 
+o projeto utiliza o python 3.13.3
+
 criar o ambiente virtual (criar a pasta venv) (sem carregar o venv) (so precisa fazer uma vez por novo projeto)
 
 quando voce instala o python, ja vem instalado o modulo/lib venv (nao precisa instalar via comando: `pip install`)
