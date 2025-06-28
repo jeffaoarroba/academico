@@ -1,5 +1,6 @@
 import sqlite3
 
+
 class BancoDados:
     def __init__(self, nome_banco='controle_academico.db'):
         self.nome_banco = nome_banco
@@ -23,7 +24,17 @@ class BancoDados:
             self.cursor = None
             print("OK desconectado")
 
-    def criar_tabela(self):
+    def executar(self, sql):
+        if not sql: return
+        if not self.cursor:
+            self.conectar()
+        self.cursor.execute(sql)
+        print("OK sql", sql)
+        dados = self.cursor.fetchall()
+        self.desconectar()
+        return dados
+
+    def criar_tabelas(self):
         """Criar as tabelas no banco de dados"""
         self.conectar()
 
@@ -43,7 +54,7 @@ class BancoDados:
             CREATE TABLE IF NOT EXISTS aluno (
                     cpf INTEGER PRIMARY KEY,
                     nome TEXT NOT NULL,
-                    data_nascimento DATE NOT NULL,
+                    ano_nascimento INTEGER NOT NULL,
                     email TEXT NOT NULL,
                     endereco TEXT NOT NULL
                 )
@@ -63,6 +74,7 @@ class BancoDados:
 
         self.desconectar()
 
+
 if __name__ == '__main__':
     banco = BancoDados()
-    banco.criar_tabela()
+    banco.criar_tabelas()
