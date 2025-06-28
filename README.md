@@ -55,3 +55,12 @@ para rodar o streamlite do projeto
 streamlit run ./src/app.py
 # ou python -m streamlit run ./src/app.py
 ```
+
+# padroes do projeto
+
+Existe uma convenção oficial para nomeação de arquivos em projetos Python,
+e ela está definida na [PEP 8](https://peps.python.org/pep-0008/#package-and-module-names),
+que é o guia oficial de estilo para código Python.
+
+> Os módulos devem ter nomes curtos, totalmente em letras minúsculas.  
+> Podem ser usados underlines (_) no nome do módulo se isso melhorar a legibilidade.
