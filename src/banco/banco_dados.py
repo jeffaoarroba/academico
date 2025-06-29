@@ -6,14 +6,15 @@ class BancoDados:
         self.nome_banco = nome_banco
         self.conexao = None
         self.cursor = None
-        print("## BANCO DE DADOS")
-        print("arquivo", nome_banco)
+        print("OK BANCO DADOS arquivo", nome_banco)
 
     def conectar(self):
         """Cria a conexao com o banco de dados"""
         self.conexao = sqlite3.connect(self.nome_banco)
+        # para cursor.fetchall retornar as colunas do sql
+        self.conexao.row_factory = sqlite3.Row
         self.cursor = self.conexao.cursor()
-        print("OK conectado")
+        print("OK BANCO DADOS conectado")
 
     def desconectar(self):
         """Fecha a conexao com o banco de dados"""
@@ -22,14 +23,17 @@ class BancoDados:
             self.conexao.close()
             self.conexao = None
             self.cursor = None
-            print("OK desconectado")
+            print("OK BANCO DADOS desconectado")
 
-    def executar(self, sql):
+    def executar(self, sql, valores=None):
         if not sql: return
         if not self.cursor:
             self.conectar()
-        self.cursor.execute(sql)
-        print("OK sql", sql)
+        if not valores:
+            self.cursor.execute(sql)
+        else:
+            self.cursor.execute(sql, valores)
+        print("OK BANCO DADOS sql", sql)
         dados = self.cursor.fetchall()
         self.desconectar()
         return dados
@@ -47,7 +51,7 @@ class BancoDados:
                 nome_professor TEXT NOT NULL
             )
         ''')
-        print("OK tabela criada: disciplina")
+        print("OK BANCO DADOS tabela: disciplina")
 
         """cria a tabela aluno, se nao existir"""
         self.cursor.execute('''
@@ -59,7 +63,7 @@ class BancoDados:
                     endereco TEXT NOT NULL
                 )
         ''')
-        print("OK tabela criada: aluno")
+        print("OK BANCO DADOS tabela: aluno")
 
         """cria a tabela matricula, se nao existir"""
         self.cursor.execute('''
@@ -70,7 +74,7 @@ class BancoDados:
                 PRIMARY KEY (codigo_disciplina, cpf_aluno)
             )            
         ''')
-        print("OK tabela criada: matricula")
+        print("OK BANCO DADOS tabela: matricula")
 
         self.desconectar()
 
