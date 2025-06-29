@@ -11,16 +11,16 @@ class Aluno:
         """valida as informacoes do aluno e retorna os erros encontrados"""
         erros = []
 
+        if not self.cpf:
+            erros.append("Informe o **CPF** do Aluno")
         if not self.nome:
-            erros.append("Informe o nome do Aluno")
+            erros.append("Informe o **NOME** do Aluno")
         if not self.ano_nascimento:
-            erros.append("Informe o ano da data de nascimento do Aluno")
-        elif self.ano_nascimento <= 1970:
-            erros.append("O ano da data de nascimento do Aluno nao pode ser inferior a 1970")
+            erros.append("Informe o **ANO** da data de nascimento do Aluno")
         if not self.email:
-            erros.append("Informe o email do Aluno")
+            erros.append("Informe o **EMAIL** do Aluno")
         if not self.endereco:
-            erros.append("Informe o endereço do Aluno")
+            erros.append("Informe o **ENDEREÇO** do Aluno")
 
         return erros
 
