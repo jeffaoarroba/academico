@@ -9,14 +9,6 @@ class AlunoApp:
         self.placeholder = placeholder
         self.aluno_db = aluno_db
 
-    def ir_para_listar_alunos(self):
-        self.st.session_state.menu = "Alunos"
-        self.st.session_state.tela = "Lista"
-
-    def ir_para_novo_aluno(self):
-        self.st.session_state.menu = "Alunos"
-        self.st.session_state.tela = "Novo"
-
     def obter_novo_aluno(self):
         return Aluno(
             self.st.session_state.novo_aluno_cpf,
@@ -38,55 +30,72 @@ class AlunoApp:
             self.st.session_state.tela = "novo_aluno_sucesso"
         self.st.session_state.erros = erros
 
+    def ir_para_lista_alunos(self):
+        self.st.session_state.menu = "Alunos"
+        self.st.session_state.tela = "Lista"
+
+    def ir_para_novo_aluno(self):
+        self.st.session_state.menu = "Alunos"
+        self.st.session_state.tela = "novo_aluno"
+
+    def exibir_novo_aluno_sucesso(self):
+        with self.placeholder.container():
+            self.st.subheader("🧑‍🎓 Aluno")
+            self.st.success("Aluno salvo com sucesso!")
+            novo_aluno = self.obter_novo_aluno()
+            self.st.write("🧑", novo_aluno.nome)
+            self.st.write("🪪", novo_aluno.cpf)
+            self.st.write("🗓️", novo_aluno.ano_nascimento)
+            self.st.write("✉️", novo_aluno.email)
+            self.st.write("🛣️", novo_aluno.endereco)
+            self.st.button("voltar", on_click=self.ir_para_lista_alunos, help="voltar para a listagem de alunos")
+
+    def exibir_novo_aluno(self):
+        with self.placeholder.container():
+            self.st.subheader("🧑‍🎓 Aluno | Novo")
+            # os asteriscos em help=**cancelar** aplica o estilo negrito (markdown)
+            self.st.button("voltar", on_click=self.ir_para_lista_alunos,
+                           help="**cancelar** o cadastro do novo aluno e voltar para a listagem de alunos")
+            with self.st.form("novo_aluno"):
+                self.st.write("Informe os dados do novo Aluno")
+
+                cpf = self.st.text_input("CPF:", max_chars=11, placeholder="informe somente os numeros do CPF",
+                                         icon="🪪",
+                                         key="novo_aluno_cpf")
+                nome = self.st.text_input("Nome:", max_chars=200,
+                                          placeholder="informe o nome completo do novo aluno",
+                                          icon="🧑", key="novo_aluno_nome")
+                ano_nascimento = self.st.number_input("Ano de Nascimento:", value=None, min_value=1970,
+                                                      max_value=datetime.now().year - 1,
+                                                      help="se a data de nascimento do Aluno é 01/02/2003, informe somente o ano 2003",
+                                                      placeholder="informe somente o ANO da data de nascimento do Aluno",
+                                                      icon="🗓️", key="novo_aluno_ano")
+                email = self.st.text_input("Email:", max_chars=200, icon="✉️", key="novo_aluno_email")
+                endereco = self.st.text_input("Endeço:", max_chars=200, icon="🛣️", key="novo_aluno_endereco")
+
+                self.st.form_submit_button("salvar novo aluno", icon="💾", on_click=self.salvar)
+
+                if "erros" in self.st.session_state and self.st.session_state.erros:
+                    self.st.error("⚠️ Revise as informações e tente novamente")
+                    for erro in self.st.session_state.erros:
+                        self.st.error(erro)
+                    self.st.session_state.erros = None
+
+    def exibir_lista_alunos(self):
+        with self.placeholder.container():
+            self.st.subheader("🧑‍🎓 Aluno | Lista")
+            self.st.button("novo aluno", on_click=self.ir_para_novo_aluno, icon="➕")
+            alunos = self.aluno_db.listar()
+            if len(alunos) == 0:
+                self.st.write("nao ha alunos cadastrados")
+            else:
+                # aluno_com_colunas = pd.DataFrame(alunos, columns=["CPF", "Aluno", "Endereco"])
+                self.st.dataframe(alunos)
+
     def exibir(self):
         if self.st.session_state.tela == "novo_aluno_sucesso":
-            with self.placeholder.container():
-                self.st.subheader("🧑‍🎓 Aluno")
-                self.st.success("Aluno salvo com sucesso!")
-                self.st.write("🧑", self.st.session_state.novo_aluno_nome.upper())
-                self.st.write("🪪", self.st.session_state.novo_aluno_cpf)
-                self.st.write("🗓️", self.st.session_state.novo_aluno_ano)
-                self.st.write("✉️", self.st.session_state.novo_aluno_email.upper())
-                self.st.write("🛣️", self.st.session_state.novo_aluno_endereco.upper())
-                self.st.button("voltar", on_click=self.ir_para_listar_alunos, help="voltar para a listagem de alunos")
-        elif self.st.session_state.tela == "Novo":
-            with self.placeholder.container():
-                self.st.subheader("🧑‍🎓 Aluno | Novo")
-                # os asteriscos em help=**cancelar** aplica o estilo negrito (markdown)
-                self.st.button("voltar", on_click=self.ir_para_listar_alunos,
-                               help="**cancelar** o cadastro do novo aluno e voltar para a listagem de alunos")
-                with self.st.form("novo_aluno"):
-                    self.st.write("Informe os dados do novo Aluno")
-
-                    cpf = self.st.text_input("CPF:", max_chars=11, placeholder="informe somente os numeros do CPF",
-                                             icon="🪪",
-                                             key="novo_aluno_cpf")
-                    nome = self.st.text_input("Nome:", max_chars=200,
-                                              placeholder="informe o nome completo do novo aluno",
-                                              icon="🧑", key="novo_aluno_nome")
-                    ano_nascimento = self.st.number_input("Ano de Nascimento:", value=None, min_value=1970,
-                                                          max_value=datetime.now().year - 1,
-                                                          help="se a data de nascimento do Aluno é 01/02/2003, informe somente o ano 2003",
-                                                          placeholder="informe somente o ANO da data de nascimento do Aluno",
-                                                          icon="🗓️", key="novo_aluno_ano")
-                    email = self.st.text_input("Email:", max_chars=200, icon="✉️", key="novo_aluno_email")
-                    endereco = self.st.text_input("Endeço:", max_chars=200, icon="🛣️", key="novo_aluno_endereco")
-
-                    self.st.form_submit_button("salvar novo aluno", icon="💾", on_click=self.salvar)
-
-                    if "erros" in self.st.session_state and self.st.session_state.erros:
-                        self.st.error("⚠️ Revise as informações e tente novamente")
-                        for erro in self.st.session_state.erros:
-                            self.st.error(erro)
-                        self.st.session_state.erros = None
-
+            self.exibir_novo_aluno_sucesso()
+        elif self.st.session_state.tela == "novo_aluno":
+            self.exibir_novo_aluno()
         else:
-            with self.placeholder.container():
-                self.st.subheader("🧑‍🎓 Aluno | Lista")
-                self.st.button("novo aluno", on_click=self.ir_para_novo_aluno, icon="➕")
-                alunos = self.aluno_db.listar()
-                if len(alunos) == 0:
-                    self.st.write("nao ha alunos cadastrados")
-                else:
-                    # aluno_com_colunas = pd.DataFrame(alunos, columns=["CPF", "Aluno", "Endereco"])
-                    self.st.dataframe(alunos)
+            self.exibir_lista_alunos()

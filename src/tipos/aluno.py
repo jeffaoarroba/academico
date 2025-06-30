@@ -1,11 +1,11 @@
 class Aluno:
 
     def __init__(self, cpf, nome, ano_nascimento, email, endereco):
-        self.cpf = cpf
-        self.nome = nome
-        self.ano_nascimento = ano_nascimento
-        self.email = email
-        self.endereco = endereco
+        self.cpf = int(cpf)
+        self.nome = nome.upper()
+        self.ano_nascimento = int(ano_nascimento)
+        self.email = email.upper()
+        self.endereco = endereco.upper()
 
     def validar(self):
         """valida as informacoes do aluno e retorna os erros encontrados"""
@@ -34,7 +34,7 @@ class Aluno:
 
         ### preparacao
         # preenche com zeros a esquerda um CPF que tenha menos de 11 digitos
-        cpf_com_onze_digitos = cpf.zfill(11)
+        cpf_com_onze_digitos = str(cpf).zfill(11)
         # pega os 9 primeiros digitos para fazer o calculo dos dois ultimos digitos verificacores
         cpf_primeiro_nove_digitos = cpf_com_onze_digitos[:9]
         # inverte a posicao dos digitos do CPF, util para simplificar o calculo que sera feito na proxima etapa
