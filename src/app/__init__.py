@@ -1,6 +1,6 @@
 import streamlit as st
 from banco import aluno_db
-from .aluno import AlunoApp
+from .aluno_app import AlunoApp
 
 placeholder = st.empty()
 aluno_app = AlunoApp(st, placeholder, aluno_db)
@@ -9,11 +9,11 @@ aluno_app = AlunoApp(st, placeholder, aluno_db)
 class App:
     def __init__(self):
         if "tela" not in st.session_state:
-            st.session_state.tela = "Lista"
+            st.session_state.tela = "listagem"
         if "menu" not in st.session_state:
             st.session_state.menu = "Alunos"
 
-        print("APP", st.session_state.menu, st.session_state.tela)
+        print("APP", st.session_state.menu.upper(), st.session_state.tela.upper())
 
         st.sidebar.title("Projeto Academico")
         # o valor selecionado no selectbox vai estar disponivel em st.session_state.menu por causa de key=menu

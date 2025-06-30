@@ -6,7 +6,7 @@ class BancoDados:
         self.nome_banco = nome_banco
         self.conexao = None
         self.cursor = None
-        print("OK BANCO DADOS arquivo", nome_banco)
+        print("BANCO DADOS arquivo", nome_banco)
 
     def conectar(self):
         """Cria a conexao com o banco de dados"""
@@ -15,7 +15,7 @@ class BancoDados:
             # para cursor.fetchall retornar as colunas do sql
             self.conexao.row_factory = sqlite3.Row
         self.cursor = self.conexao.cursor()
-        print("OK BANCO DADOS conectado")
+        print("BANCO DADOS conectado")
 
     def desconectar(self):
         """Fecha a conexao com o banco de dados"""
@@ -24,7 +24,7 @@ class BancoDados:
             self.conexao.close()
             self.conexao = None
             self.cursor = None
-            print("OK BANCO DADOS desconectado")
+            print("BANCO DADOS desconectado")
 
     def confirmar(self):
         if self.conexao:
@@ -38,7 +38,7 @@ class BancoDados:
             self.cursor.execute(sql)
         else:
             self.cursor.execute(sql, parametros)
-        print("OK BANCO DADOS sql", sql)
+        print("BANCO DADOS sql", sql)
         dados = self.cursor.fetchall()
         self.desconectar()
         lista = []
@@ -64,7 +64,7 @@ class BancoDados:
                 nome_professor TEXT NOT NULL
             )
         ''')
-        print("OK BANCO DADOS tabela: disciplina")
+        print("BANCO DADOS tabela: disciplina")
 
         """cria a tabela aluno, se nao existir"""
         self.cursor.execute('''
@@ -76,7 +76,7 @@ class BancoDados:
                     endereco TEXT NOT NULL
                 )
         ''')
-        print("OK BANCO DADOS tabela: aluno")
+        print("BANCO DADOS tabela: aluno")
 
         """cria a tabela matricula, se nao existir"""
         self.cursor.execute('''
@@ -87,7 +87,7 @@ class BancoDados:
                 PRIMARY KEY (codigo_disciplina, cpf_aluno)
             )            
         ''')
-        print("OK BANCO DADOS tabela: matricula")
+        print("BANCO DADOS tabela: matricula")
 
         self.desconectar()
 

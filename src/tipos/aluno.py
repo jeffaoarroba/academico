@@ -1,14 +1,20 @@
 class Aluno:
 
     def __init__(self, cpf, nome, ano_nascimento, email, endereco):
-        self.cpf = int(cpf)
+        self.cpf = 0
+        self.ano_nascimento = 0
+
+        if cpf:
+            self.cpf = int(cpf)
+        if ano_nascimento:
+            self.ano_nascimento = int(ano_nascimento)
+
         self.nome = nome.upper()
-        self.ano_nascimento = int(ano_nascimento)
         self.email = email.upper()
         self.endereco = endereco.upper()
 
     def validar(self):
-        """valida as informacoes do aluno e retorna os erros encontrados"""
+        """ valida as informacoes do aluno e retorna os erros encontrados """
         erros = []
 
         if not self.cpf:
@@ -69,14 +75,14 @@ class Aluno:
 
 """
 curiosidade CPF com 11 digitos com o mesmo valor sao CPFs validos, exemplo
+00000000000
 11111111111
 22222222222
 33333333333
 44444444444
 55555555555
 ...
-pois passam com sucesso na validacao e no calculo dos digitos verificadores, inclusive
-00000000000
+pois passam com sucesso na validacao e no calculo dos digitos verificadores,
 outra sequencia simples que passa na validacao do CPF
 01234567890
 """

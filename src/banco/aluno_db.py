@@ -41,10 +41,10 @@ if __name__ == "__main__":
     aluno_db = AlunoDB(db)
 
     # cpfs = db.executar("SELECT cpf FROM aluno")
-    # print("OK ALUNO DB cpfs", [dict(cpf) for cpf in cpfs])
+    # print("ALUNO DB cpfs", [dict(cpf) for cpf in cpfs])
 
     # cpf_ja_existe = aluno_db.cpf_ja_existe("11111111111")
-    # print("OK ALUNO DB cpf 11111111111 ja existe?", cpf_ja_existe)
+    # print("ALUNO DB cpf 11111111111 ja existe?", cpf_ja_existe)
 
     cpf_ja_existe = aluno_db.cpf_ja_existe("01234567890")
     print("TESTE ALUNO DB cpf 01234567890 ja existe?", cpf_ja_existe)
