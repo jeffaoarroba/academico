@@ -10,9 +10,10 @@ class BancoDados:
 
     def conectar(self):
         """Cria a conexao com o banco de dados"""
-        self.conexao = sqlite3.connect(self.nome_banco)
-        # para cursor.fetchall retornar as colunas do sql
-        self.conexao.row_factory = sqlite3.Row
+        if not self.conexao:
+            self.conexao = sqlite3.connect(self.nome_banco)
+            # para cursor.fetchall retornar as colunas do sql
+            self.conexao.row_factory = sqlite3.Row
         self.cursor = self.conexao.cursor()
         print("OK BANCO DADOS conectado")
 
@@ -25,17 +26,29 @@ class BancoDados:
             self.cursor = None
             print("OK BANCO DADOS desconectado")
 
-    def executar(self, sql, valores=None):
+    def confirmar(self):
+        if self.conexao:
+            self.conexao.commit()
+
+    def executar(self, sql, parametros=None):
         if not sql: return
         if not self.cursor:
             self.conectar()
-        if not valores:
+        if not parametros:
             self.cursor.execute(sql)
         else:
-            self.cursor.execute(sql, valores)
+            self.cursor.execute(sql, parametros)
         print("OK BANCO DADOS sql", sql)
         dados = self.cursor.fetchall()
         self.desconectar()
+        lista = []
+        for registro in dados:
+            item = dict(registro)
+            lista.append(item)
+        return lista
+
+    def select(self, select, parametros=None):
+        dados = self.executar(select, parametros)
         return dados
 
     def criar_tabelas(self):
