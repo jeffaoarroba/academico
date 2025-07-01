@@ -13,7 +13,13 @@ class AlunoApp:
 
     def obter_novo_aluno(self):
         if self.st.session_state.novo_aluno_cep_erro:
-            self.st.session_state.novo_aluno_endereco = self.st.session_state.novo_aluno_logradouro + ", " + self.st.session_state.novo_aluno_bairro + ", " + self.st.session_state.novo_aluno_cidade + ", " + self.st.session_state.novo_aluno_estado
+            self.st.session_state.novo_aluno_endereco = ", ".join(list(filter(None, [
+                self.st.session_state.novo_aluno_logradouro,
+                self.st.session_state.novo_aluno_bairro,
+                self.st.session_state.novo_aluno_cidade,
+                self.st.session_state.novo_aluno_estado,
+                "CEP:" + self.st.session_state.novo_aluno_cep
+            ])))
         return Aluno(
             self.st.session_state.novo_aluno_cpf,
             self.st.session_state.novo_aluno_nome,
@@ -47,10 +53,11 @@ class AlunoApp:
     def exibir_novo_aluno_sucesso(self):
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno")
-            self.st.button("voltar", on_click=self.ir_para_lista_alunos, help="voltar para a listagem de alunos")
+            self.st.button("voltar", on_click=self.ir_para_lista_alunos,
+                           help="voltar para a listagem de alunos")
             self.st.success("Aluno salvo com sucesso!")
             novo_aluno = self.obter_novo_aluno()
-            self.st.write("🧑", novo_aluno.nome)
+            self.st.write("🧑", novo_aluno.nome, )
             self.st.write("🪪", novo_aluno.cpf)
             self.st.write("🗓️", novo_aluno.ano_nascimento)
             self.st.write("✉️", novo_aluno.email)
@@ -65,20 +72,21 @@ class AlunoApp:
             self.st.write("Informe os dados do novo Aluno")
 
             self.st.text_input("CPF:", max_chars=11, placeholder="informe somente os numeros do CPF",
-                                     icon="🪪",
-                                     key="novo_aluno_cpf")
+                               icon="🪪",
+                               key="novo_aluno_cpf")
             self.st.text_input("Nome:", max_chars=200,
-                                      placeholder="informe o nome completo do novo aluno",
-                                      icon="🧑", key="novo_aluno_nome")
+                               placeholder="informe o nome completo do novo aluno",
+                               icon="🧑", key="novo_aluno_nome")
             self.st.number_input("Ano de Nascimento:", value=None, min_value=1970,
-                                                  max_value=datetime.now().year - 1,
-                                                  help="se a data de nascimento do Aluno é 01/02/2003, informe somente o ano 2003",
-                                                  placeholder="informe somente o ANO da data de nascimento do Aluno",
-                                                  icon="🗓️", key="novo_aluno_ano")
-            self.st.text_input("Email:", max_chars=200, icon="✉️", key="novo_aluno_email")
+                                 max_value=datetime.now().year - 1,
+                                 help="se a data de nascimento do Aluno é 01/02/2003, informe somente o ano 2003",
+                                 placeholder="informe somente o ANO da data de nascimento do Aluno",
+                                 icon="🗓️", key="novo_aluno_ano")
+            self.st.text_input("Email:", max_chars=200,
+                               icon="✉️", key="novo_aluno_email")
 
             self.st.text_input("CEP:", placeholder="informe somente os numeros do CEP", max_chars=200,
-                                     icon="🛣️", key="novo_aluno_cep")
+                               icon="🛣️", key="novo_aluno_cep")
 
             clicou_em_consultar_cep = self.st.button("consultar CEP", icon="🔎")
 
@@ -87,14 +95,18 @@ class AlunoApp:
                 self.st.session_state.novo_aluno_endereco = ""
                 try:
                     if self.st.session_state.novo_aluno_cep:
-                        print("APP ALUNO consultar_cep", self.st.session_state.novo_aluno_cep)
-                        consulta_cep = ViaCEP(self.st.session_state.novo_aluno_cep).obter_endereco_completo()
+                        print("APP ALUNO consultar_cep",
+                              self.st.session_state.novo_aluno_cep)
+                        consulta_cep = ViaCEP(
+                            self.st.session_state.novo_aluno_cep).obter_endereco_completo()
                         if consulta_cep['erro']:
-                            print("ERRO APP ALUNO consultar_cep", consulta_cep['erro'])
+                            print("ERRO APP ALUNO consultar_cep",
+                                  consulta_cep['erro'])
                             self.st.session_state.novo_aluno_cep_erro = consulta_cep['erro']
                         else:
                             self.st.session_state.novo_aluno_endereco = consulta_cep['endereco_completo']
-                            print("APP ALUNO endereco_completo", consulta_cep['endereco_completo'])
+                            print("APP ALUNO endereco_completo",
+                                  consulta_cep['endereco_completo'])
                             # self.st.write(consulta_cep['endereco_completo'])
                     else:
                         print("APP ALUNO cep não informado")
@@ -104,20 +116,21 @@ class AlunoApp:
                     self.st.session_state.novo_aluno_cep_erro = e
 
             if self.st.session_state.novo_aluno_endereco:
-                self.st.text_input("Endereço", disabled=True, value=self.st.session_state.novo_aluno_endereco)
+                self.st.text_input("Endereço", disabled=True,
+                                   value=self.st.session_state.novo_aluno_endereco)
 
             if self.st.session_state.novo_aluno_cep_erro:
                 self.st.error(self.st.session_state.novo_aluno_cep_erro)
 
                 self.st.text_input("Logradouro:", placeholder="rua Canela, 110", max_chars=200,
-                                                key="novo_aluno_logradouro")
+                                   key="novo_aluno_logradouro")
                 self.st.text_input("Bairro:", placeholder="Centro", max_chars=200,
-                                            key="novo_aluno_bairro")
+                                   key="novo_aluno_bairro")
                 self.st.text_input("Cidade:", placeholder="Serra", max_chars=200,
-                                            key="novo_aluno_cidade")
+                                   key="novo_aluno_cidade")
                 self.st.text_input("Estado:", placeholder="ES",
-                                            help="informe a sigla do Estado (UF) do endereço do Aluno",
-                                            max_chars=2, key="novo_aluno_estado")
+                                   help="informe a sigla do Estado (UF) do endereço do Aluno",
+                                   max_chars=2, key="novo_aluno_estado")
 
             self.st.button("salvar novo aluno", icon="💾", on_click=self.salvar)
 
@@ -132,7 +145,8 @@ class AlunoApp:
     def exibir_lista_alunos(self):
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno | Lista")
-            self.st.button("novo aluno", on_click=self.ir_para_novo_aluno, icon="➕")
+            self.st.button(
+                "novo aluno", on_click=self.ir_para_novo_aluno, icon="➕")
             alunos = self.aluno_db.listar()
             if len(alunos) == 0:
                 self.st.write("nao ha alunos cadastrados")
@@ -144,5 +158,5 @@ class AlunoApp:
             self.exibir_novo_aluno_sucesso()
         elif self.st.session_state.tela == "novo_aluno":
             self.exibir_novo_aluno()
-        else: # lista_alunos
+        else:  # lista_alunos
             self.exibir_lista_alunos()

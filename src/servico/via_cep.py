@@ -1,6 +1,10 @@
 import requests
 import json
 
+# https://docs.python.org/pt-br/3.13/library/stdtypes.html#str.join
+# https://docs.python.org/pt-br/3.13/library/functions.html#filter
+# https://www.digitalocean.com/community/tutorials/how-to-use-the-python-filter-function-pt#como-usar-none-com-filter
+
 
 class ViaCEP:
     def __init__(self, cep):
@@ -38,7 +42,14 @@ class ViaCEP:
 
             return {
                 "erro": False,
-                "endereco_completo": logradouro + ", " + bairro + ", " + localidade + "-" + uf + " CEP:" + self.cep
+                # "endereco_completo": logradouro + ", " + bairro + ", " + localidade + "-" + uf + " CEP:" + self.cep
+                "endereco_completo": ", ".join(list(filter(None, [
+                    logradouro,
+                    bairro,
+                    localidade,
+                    uf,
+                    "CEP:" + self.cep
+                ])))
             }
         except Exception as e:
             print("ERRO SERVICO CEP Ocorreu um erro inesperado", e)
