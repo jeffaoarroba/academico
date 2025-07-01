@@ -1,11 +1,12 @@
 from datetime import datetime
+from banco.aluno_db import AlunoDB
 from tipos.aluno import Aluno
 from servico.via_cep import ViaCEP
 
 
 class AlunoApp:
 
-    def __init__(self, st, placeholder, aluno_db):
+    def __init__(self, st, placeholder, aluno_db: AlunoDB):
         self.st = st
         self.placeholder = placeholder
         self.aluno_db = aluno_db
@@ -25,7 +26,7 @@ class AlunoApp:
         print("APP ALUNO clicou em salvar novo aluno")
         novo_aluno = self.obter_novo_aluno()
         erros = novo_aluno.validar()
-        cpf_ja_existe = self.aluno_db.cpf_ja_existe(novo_aluno.cpf)
+        cpf_ja_existe = self.aluno_db.verificar_cpf_em_uso(novo_aluno.cpf)
         if cpf_ja_existe:
             erros.insert(0, "🪪 O **CPF** informado já está sendo utilizado")
         if not erros:
@@ -35,7 +36,7 @@ class AlunoApp:
 
     def ir_para_lista_alunos(self):
         self.st.session_state.menu = "Alunos"
-        self.st.session_state.tela = "listagem"
+        self.st.session_state.tela = "lista_alunos"
 
     def ir_para_novo_aluno(self):
         self.st.session_state.novo_aluno_cep_erro = False
@@ -143,5 +144,5 @@ class AlunoApp:
             self.exibir_novo_aluno_sucesso()
         elif self.st.session_state.tela == "novo_aluno":
             self.exibir_novo_aluno()
-        else: # listagem
+        else: # lista_alunos
             self.exibir_lista_alunos()

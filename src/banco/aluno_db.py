@@ -1,3 +1,6 @@
+from tipos.aluno import Aluno
+
+
 class AlunoDB:
     def __init__(self, db):
         self.db = db
@@ -5,49 +8,85 @@ class AlunoDB:
     def listar(self):
         alunos = self.db.select(
             """
-                SELECT cpf as CPF, nome as Nome, endereco as Endereco
-                FROM aluno
-                ORDER BY nome ASC
+            SELECT cpf as CPF, nome as Nome, endereco as Endereco
+            FROM aluno
+            ORDER BY nome ASC
             """
         )
         return alunos
 
-    def cpf_ja_existe(self, cpf):
+    def verificar_cpf_em_uso(self, cpf):
+        if not cpf:
+            return False
+
         registros = self.db.select(
-            "SELECT cpf FROM aluno WHERE cpf = ?",
+            """
+            SELECT cpf FROM aluno WHERE cpf = ?
+            """,
             (int(cpf),)
         )
+
         if not len(registros):
             return False
-        registro_cpf = registros[0].get("cpf")
-        cpf_ja_existe_valor = registro_cpf == int(cpf)
-        return cpf_ja_existe_valor
 
-    def cadastrar(self, aluno):
+        registro_cpf = registros[0].get("cpf")
+        cpf_em_uso = registro_cpf == int(cpf)
+
+        return cpf_em_uso
+
+    def cadastrar(self, aluno: Aluno):
         self.db.executar(
             """
-                INSERT INTO aluno(cpf, nome, ano_nascimento, email, endereco)
-                VALUES(?, ?, ?, ?, ?)
+            INSERT INTO aluno(cpf, nome, ano_nascimento, email, endereco)
+            VALUES(?, ?, ?, ?, ?)
             """,
-            (int(aluno.cpf), aluno.nome, int(aluno.ano_nascimento), aluno.email, aluno.endereco)
+            (
+                int(aluno.cpf),
+                aluno.nome,
+                int(aluno.ano_nascimento),
+                aluno.email,
+                aluno.endereco
+            )
         )
         self.db.confirmar()
 
+    def excluir(self, cpf):
+        if not cpf:
+            return
 
-if __name__ == "__main__":
-    from banco_dados import BancoDados
+        self.db.executar(
+            """
+            DELETE FROM aluno WHERE cpf = ?
+            """,
+            (int(cpf),)
+        )
 
-    db = BancoDados("../../controle_academico.db")
-    aluno_db = AlunoDB(db)
+        self.db.confirmar()
 
-    # cpfs = db.executar("SELECT cpf FROM aluno")
-    # print("ALUNO DB cpfs", [dict(cpf) for cpf in cpfs])
+    def obter(self, cpf):
+        if not cpf:
+            return None
 
-    # cpf_ja_existe = aluno_db.cpf_ja_existe("11111111111")
-    # print("ALUNO DB cpf 11111111111 ja existe?", cpf_ja_existe)
+        registros = self.db.select(
+            """
+            SELECT
+                cpf as CPF,
+                nome as Nome,
+                ano_nascimento as AnoNascimento,
+                email as Email,
+                endereco as Endereco
+            FROM aluno WHERE cpf = ?
+            """,
+            (int(cpf),)
+        )
 
-    cpf_ja_existe = aluno_db.cpf_ja_existe("01234567890")
-    print("TESTE ALUNO DB cpf 01234567890 ja existe?", cpf_ja_existe)
+        if not len(registros):
+            return None
 
-    cpf_ja_existe = aluno_db.cpf_ja_existe("1234567890")
-    print("TESTE ALUNO DB cpf 1234567890 ja existe?", cpf_ja_existe)
+        return Aluno(
+            registros[0]["CPF"],
+            registros[0]["Nome"],
+            registros[0]["AnoNascimento"],
+            registros[0]["Email"],
+            registros[0]["Endereco"]
+        )
