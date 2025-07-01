@@ -33,6 +33,7 @@ class Aluno:
         return erros
 
     def validarCPF(self, cpf):
+        print("ALUNO VALIDAR cpf", cpf)
         ### Recebe uma string com o CPF,
         # extrai os 9 primeiros dígitos do CPF
         # e calcula os dois ultimos dígitos verificadores

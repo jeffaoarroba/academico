@@ -46,5 +46,5 @@ class ViaCEP:
 
 
 if __name__ == "__main__":
-    endereco_completo = ViaCEP("29171-31").obter_endereco_completo()
+    endereco_completo = ViaCEP("29171131").obter_endereco_completo()
     print("endereco:", endereco_completo)
