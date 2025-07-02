@@ -1,6 +1,8 @@
 import requests
 import json
 
+from util import gerar_endereco_completo
+
 # https://docs.python.org/pt-br/3.13/library/stdtypes.html#str.join
 # https://docs.python.org/pt-br/3.13/library/functions.html#filter
 # https://www.digitalocean.com/community/tutorials/how-to-use-the-python-filter-function-pt#como-usar-none-com-filter
@@ -37,19 +39,19 @@ class ViaCEP:
             # informacoes do endereco
             logradouro = data.get('logradouro', '')
             bairro = data.get('bairro', '')
-            localidade = data.get('localidade', '')
+            cidade = data.get('localidade', '')
             uf = data.get('uf', '')
 
             return {
                 "erro": False,
                 # "endereco_completo": logradouro + ", " + bairro + ", " + localidade + "-" + uf + " CEP:" + self.cep
-                "endereco_completo": ", ".join(list(filter(None, [
+                "endereco_completo": gerar_endereco_completo(
                     logradouro,
                     bairro,
-                    localidade,
+                    cidade,
                     uf,
-                    "CEP:" + self.cep
-                ])))
+                    self.cep
+                )
             }
         except Exception as e:
             print("ERRO SERVICO CEP Ocorreu um erro inesperado", e)

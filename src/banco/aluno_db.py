@@ -1,4 +1,4 @@
-from tipos.aluno import Aluno
+from tipo.aluno import Aluno
 
 
 class AlunoDB:
@@ -50,7 +50,7 @@ class AlunoDB:
         )
         self.db.confirmar()
 
-    def excluir(self, cpf):
+    def excluir_por_cpf(self, cpf):
         if not cpf:
             return
 
@@ -63,7 +63,7 @@ class AlunoDB:
 
         self.db.confirmar()
 
-    def obter(self, cpf):
+    def obter_por_cpf(self, cpf):
         if not cpf:
             return None
 
@@ -90,3 +90,20 @@ class AlunoDB:
             registros[0]["Email"],
             registros[0]["Endereco"]
         )
+
+    def atualizar(self, aluno: Aluno):
+        self.db.executar(
+            """
+            UPDATE aluno
+            SET nome = ?, ano_nascimento = ?, email = ?, endereco = ?
+            WHERE cpf = ?
+            """,
+            (
+                aluno.nome,
+                int(aluno.ano_nascimento),
+                aluno.email,
+                aluno.endereco,
+                int(aluno.cpf)
+            )
+        )
+        self.db.confirmar()
