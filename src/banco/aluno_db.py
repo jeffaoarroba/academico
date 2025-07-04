@@ -91,6 +91,24 @@ class AlunoDB:
             registros[0]["Endereco"]
         )
 
+    def obter_nome_aluno_por_cpf(self, cpf):
+        if not cpf:
+            return None
+
+        registros = self.db.select(
+            """
+            SELECT nome
+            FROM aluno
+            WHERE cpf = ?
+            """,
+            (int(cpf),)
+        )
+
+        if not len(registros):
+            return None
+
+        return registros[0]["nome"]
+
     def atualizar(self, aluno: Aluno):
         self.db.executar(
             """

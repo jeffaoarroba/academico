@@ -6,7 +6,7 @@ from .aluno_app import AlunoApp
 class App:
     def __init__(self):
         if "tela" not in st.session_state:
-            st.session_state.tela = "listagem"
+            st.session_state.tela = "listar_alunos"
         if "menu" not in st.session_state:
             st.session_state.menu = "Alunos"
 
