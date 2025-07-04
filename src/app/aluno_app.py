@@ -77,9 +77,6 @@ class AlunoApp:
             self.aluno_db.atualizar(aluno)
             self.st.session_state.tela = "editar_aluno_sucesso"
 
-    def editar_aluno_cpf(self):
-        print("TESTE")
-
     # EXCLUIR ALUNO
 
     def excluir_aluno(self):
@@ -107,17 +104,20 @@ class AlunoApp:
     # IR PARA TELAS
 
     def ir_para_listar_alunos(self):
+        print("APP ALUNO ir_para_listar_alunos")
         self.st.session_state.editar_aluno_cpf_erro = None
         self.st.session_state.excluir_aluno_cpf_erro = None
         self.st.session_state.excluir_aluno_cpf_aoconfirmar = None
         self.st.session_state.tela = "listar_alunos"
 
     def ir_para_novo_aluno(self):
+        print("APP ALUNO ir_para_novo_aluno")
         self.st.session_state.novo_aluno_cep_erro = False
         self.st.session_state.novo_aluno_endereco = ""
         self.st.session_state.tela = "novo_aluno"
 
     def ir_para_editar_aluno(self):
+        print("APP ALUNO ir_para_editar_aluno")
         self.st.session_state.editar_aluno_cep_erro = False
         self.st.session_state.editar_aluno_endereco = ""
 
@@ -137,6 +137,7 @@ class AlunoApp:
         self.st.session_state.tela = "editar_aluno"
 
     def ir_para_excluir_aluno(self):
+        print("APP ALUNO ir_para_excluir_aluno")
         self.st.session_state.excluir_aluno_cpf_confirmado = None
         self.st.session_state.excluir_aluno_cpf_erro = None
         cpf = self.st.session_state.excluir_aluno_cpf
@@ -156,6 +157,7 @@ class AlunoApp:
     # EXIBIR TELAS
 
     def exibir_novo_aluno_sucesso(self):
+        print("APP ALUNO exibir_novo_aluno_sucesso")
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno")
             self.st.button("voltar",
@@ -170,6 +172,7 @@ class AlunoApp:
             self.st.write("🛣️", novo_aluno.endereco)
 
     def exibir_novo_aluno(self):
+        print("APP ALUNO exibir_novo_aluno")
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno | Novo")
             # os asteriscos em help=**cancelar** aplica o estilo negrito (markdown)
@@ -266,6 +269,7 @@ class AlunoApp:
                 self.st.session_state.erros = None
 
     def exibir_editar_aluno_sucesso(self):
+        print("APP ALUNO exibir_editar_aluno_sucesso")
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno")
             self.st.button("voltar",
@@ -280,6 +284,7 @@ class AlunoApp:
             self.st.write("🛣️", aluno.endereco)
 
     def exibir_editar_aluno(self):
+        print("APP ALUNO exibir_editar_aluno")
         aluno = self.st.session_state.editar_aluno_selecionado
 
         with self.placeholder.container():
@@ -378,6 +383,7 @@ class AlunoApp:
                 self.st.session_state.erros = None
 
     def exibir_listar_alunos(self):
+        print("APP ALUNO exibir_listar_alunos")
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno | Lista")
             col1, col2, col3 = self.st.columns([1, 1, 2])
@@ -429,6 +435,7 @@ class AlunoApp:
                 self.st.dataframe(alunos)
 
     def exibir_excluir_aluno(self):
+        print("APP ALUNO exibir_excluir_aluno")
         cpf = self.st.session_state.excluir_aluno_cpf
         self.st.session_state.excluir_aluno_cpf_aoconfirmar = cpf
         aluno = self.aluno_db.obter_por_cpf(int(cpf))
@@ -436,7 +443,7 @@ class AlunoApp:
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno | Excluir")
             self.st.button("voltar",
-                           help="**cancelar** a exclusão do Aluno e voltar para a listagem de alunos",
+                           help="**cancelar** a exclusão do Aluno e voltar para a listagem de Alunos",
                            on_click=self.ir_para_listar_alunos)
             if aluno:
                 self.st.write(
