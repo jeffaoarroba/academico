@@ -6,9 +6,24 @@ class AlunoDB:
         self.db = db
 
     def listar(self):
+        # https://www.sqlite.org/lang_datefunc.html
+        #
+        # no sqlite strftime('%Y', 'now') retorna o ano atual como string
+        # CAST(strftime('%Y', 'now') AS INTEGER) converte o ano atual de string para numero para poder fazer operações matemáticas (como subtração)
+        # ano_nascimento é o ano de nascimento do aluno
+        # CAST(strftime('%Y', 'now') AS INTEGER) - ano_nascimento calcula a idade do aluno
+        #
+        # ORDER BY nome ASC ordena os alunos pelo nome em ordem alfabética
+        #
+
         alunos = self.db.select(
             """
-            SELECT cpf as CPF, nome as Nome, endereco as Endereco
+            SELECT
+                cpf as CPF,
+                nome as Nome,
+                CAST(strftime('%Y', 'now') AS INTEGER) - ano_nascimento as Idade,
+                email as Email,
+                endereco as Endereco
             FROM aluno
             ORDER BY nome ASC
             """
