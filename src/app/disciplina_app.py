@@ -105,9 +105,9 @@ class DisciplinaApp:
 
     def exibir_nova_disciplina_sucesso(self):
         with self.placeholder.container():
-            self.st.subheader("📚 disciplina")
+            self.st.subheader("📚 Disciplina")
             self.st.button("voltar",
-                           help="voltar para a listagem de disciplinas",
+                           help="voltar para a listagem de Disciplinas",
                            on_click=self.ir_para_listar_disciplinas)
             self.st.success("Disciplina salvo com sucesso!")
             nova_disciplina = self.obter_nova_disciplina()
@@ -121,13 +121,13 @@ class DisciplinaApp:
             self.st.subheader("📚 Disciplina | Nova")
             # os asteriscos em help=**cancelar** aplica o estilo negrito (markdown)
             self.st.button("voltar", on_click=self.ir_para_listar_disciplinas,
-                           help="**cancelar** o cadastro da nova disciplina e voltar para a listagem de disciplinas")
-            self.st.write("Informe os dados da nova disciplina")
+                           help="**cancelar** o cadastro da nova Disciplina e voltar para a listagem de Disciplinas")
+            self.st.write("Informe os dados da nova Disciplina")
 
             self.st.write("🪪 Código: _será gerado automaticamente_")
             self.st.text_input("Nome:",
                                max_chars=200,
-                               placeholder="informe o nome completo da nova disciplina",
+                               placeholder="informe o Nome da nova Disciplina",
                                icon="📘",
                                key="nova_disciplina_nome")
             self.st.number_input("Carga horária:",
@@ -210,7 +210,7 @@ class DisciplinaApp:
 
             disciplinas = self.disciplina_db.listar()
             if len(disciplinas) == 0:
-                self.st.write("nao ha disciplinas cadastradas")
+                self.st.write("nao ha Disciplinas cadastradas")
             else:
                 with col2:
                     clicou_em_editar_disciplina = self.st.button("editar disciplina",

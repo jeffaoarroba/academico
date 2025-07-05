@@ -177,7 +177,7 @@ class AlunoApp:
             self.st.subheader("🧑‍🎓 Aluno | Novo")
             # os asteriscos em help=**cancelar** aplica o estilo negrito (markdown)
             self.st.button("voltar", on_click=self.ir_para_listar_alunos,
-                           help="**cancelar** o cadastro do novo aluno e voltar para a listagem de alunos")
+                           help="**cancelar** o cadastro do novo Aluno e voltar para a listagem de Alunos")
             self.st.write("Informe os dados do novo Aluno")
 
             self.st.text_input("CPF:",
@@ -187,7 +187,7 @@ class AlunoApp:
                                key="novo_aluno_cpf")
             self.st.text_input("Nome:",
                                max_chars=200,
-                               placeholder="informe o nome completo do novo aluno",
+                               placeholder="informe o nome completo do novo Aluno",
                                icon="🧑",
                                key="novo_aluno_nome")
             self.st.number_input("Ano de Nascimento:",
@@ -290,13 +290,13 @@ class AlunoApp:
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno | Editar")
             self.st.button("voltar",
-                           help="**cancelar** a edição do Aluno e voltar para a listagem de alunos",
+                           help="**cancelar** a edição do Aluno e voltar para a listagem de Alunos",
                            on_click=self.ir_para_listar_alunos)
             self.st.subheader(f"🪪 {aluno.cpf} {aluno.nome}")
             self.st.write(
                 "Preencha somente as informações que deseja alterar e clique em **salvar**")
             self.st.text_input("Nome:", max_chars=200,
-                               placeholder="informe o nome completo do novo aluno",
+                               placeholder="informe o nome completo do Aluno",
                                icon="🧑",
                                key="editar_aluno_nome")
             self.st.number_input("Ano de Nascimento:",
