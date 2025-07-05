@@ -1,4 +1,5 @@
 class Disciplina:
+    """ Classe que representa uma Disciplina """
 
     def __init__(self, nome, carga_horaria, nome_professor, codigo=None):
         self.codigo = int(codigo) if codigo else None
@@ -11,16 +12,16 @@ class Disciplina:
         erros = []
 
         if self.codigo and self.codigo <= 0:
-            erros.append("🪪 O CODIGO da Disciplina informado é invalido!")
+            erros.append("🪪 O **CODIGO** da Disciplina informado é invalido!")
         if not self.nome:
-            erros.append("📘 Informe o NOME da Disciplina")
+            erros.append("📘 Informe o **NOME** da Disciplina")
         if not self.carga_horaria:
-            erros.append("⏳ Informe a CARGA HORARIA da Disciplina")
+            erros.append("⏳ Informe a **CARGA HORARIA** da Disciplina")
         elif self.carga_horaria <= 0:
             erros.append(
-                "⏳ A CARGA HORARIA da Disciplina deve ser um valor maior que zero")
+                "⏳ A **CARGA HORARIA** da Disciplina deve ser um valor maior que zero")
         if not self.nome_professor:
-            erros.append("👨‍🏫 Informe o NOME DO PROFESSOR da Disciplina")
+            erros.append("👨‍🏫 Informe o **PROFESSOR** da Disciplina")
 
         return erros
 

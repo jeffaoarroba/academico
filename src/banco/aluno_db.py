@@ -85,11 +85,12 @@ class AlunoDB:
         registros = self.db.select(
             """
             SELECT
-                cpf as CPF,
-                nome as Nome,
-                ano_nascimento as AnoNascimento,
-                email as Email,
-                endereco as Endereco
+                cpf,
+                nome,
+                ano_nascimento,
+                CAST(strftime('%Y', 'now') AS INTEGER) - ano_nascimento as idade,
+                email,
+                endereco
             FROM aluno WHERE cpf = ?
             """,
             (int(cpf),)
@@ -99,11 +100,11 @@ class AlunoDB:
             return None
 
         return Aluno(
-            registros[0]["CPF"],
-            registros[0]["Nome"],
-            registros[0]["AnoNascimento"],
-            registros[0]["Email"],
-            registros[0]["Endereco"]
+            registros[0]["cpf"],
+            registros[0]["nome"],
+            registros[0]["ano_nascimento"],
+            registros[0]["email"],
+            registros[0]["endereco"]
         )
 
     def obter_nome_aluno_por_cpf(self, cpf):

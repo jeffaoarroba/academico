@@ -2,7 +2,7 @@ from datetime import datetime
 from banco.aluno_db import AlunoDB
 from tipo.aluno import Aluno
 from servico.via_cep import ViaCEP
-from util import gerar_endereco_completo
+from util import gerar_endereco_completo, eh_cpf_valido
 
 
 class AlunoApp:
@@ -86,7 +86,7 @@ class AlunoApp:
             self.st.session_state.excluir_aluno_cpf_erro = "🪪 Informe um CPF válido para excluir um Aluno!"
             return
 
-        eh_cpf_valido = Aluno.validar_cpf(None, cpf)
+        eh_cpf_valido = eh_cpf_valido(cpf)
         if not eh_cpf_valido:
             self.st.session_state.excluir_aluno_cpf_erro = "🪪 Informe um CPF válido para excluir um Aluno!"
             return
@@ -98,7 +98,7 @@ class AlunoApp:
 
         nome_aluno = self.aluno_db.obter_nome_aluno_por_cpf(int(cpf))
         self.aluno_db.excluir_por_cpf(int(cpf))
-        self.st.session_state.excluir_aluno_mensagem = f"🔥 Aluno **{nome_aluno}** excluído com sucesso!"
+        self.st.session_state.excluir_aluno_mensagem = f"Aluno **{nome_aluno}** excluído com sucesso!"
         self.st.session_state.tela = "listar_alunos"
 
     # IR PARA TELAS
@@ -122,8 +122,8 @@ class AlunoApp:
         self.st.session_state.editar_aluno_endereco = ""
 
         cpf = self.st.session_state.editar_aluno_cpf
-        eh_cpf_valido = Aluno.validar_cpf(None, cpf)
-        if not eh_cpf_valido:
+        eh_cpf_valido_valor = eh_cpf_valido(cpf)
+        if not eh_cpf_valido_valor:
             self.st.session_state.editar_aluno_cpf_erro = "🪪 Informe um CPF válido para editar um Aluno!"
             return
 
@@ -133,7 +133,7 @@ class AlunoApp:
             return
 
         self.st.session_state.editar_aluno_selecionado = self.aluno_db.obter_por_cpf(
-            int(cpf))
+            cpf)
         self.st.session_state.tela = "editar_aluno"
 
     def ir_para_excluir_aluno(self):
@@ -142,8 +142,8 @@ class AlunoApp:
         self.st.session_state.excluir_aluno_cpf_erro = None
         cpf = self.st.session_state.excluir_aluno_cpf
 
-        eh_cpf_valido = Aluno.validar_cpf(None, cpf)
-        if not eh_cpf_valido:
+        eh_cpf_valido_valor = eh_cpf_valido(cpf)
+        if not eh_cpf_valido_valor:
             self.st.session_state.excluir_aluno_cpf_erro = "🪪 Informe um CPF válido para excluir um Aluno!"
             return
 
@@ -160,14 +160,22 @@ class AlunoApp:
         print("APP ALUNO exibir_novo_aluno_sucesso")
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno")
-            self.st.button("voltar",
-                           help="voltar para a listagem de Alunos",
-                           on_click=self.ir_para_listar_alunos)
-            self.st.success("Aluno salvo com sucesso!")
+            col1, col2, col3 = self.st.columns([1, 1, 3])
+            with col1:
+                self.st.button("voltar",
+                               help="voltar para a listagem de Alunos",
+                               on_click=self.ir_para_listar_alunos)
+            with col2:
+                self.st.button("novo aluno",
+                               help="cadastrar um novo Aluno",
+                               icon="➕",
+                               on_click=self.ir_para_novo_aluno)
+            self.st.success("Aluno salvo com sucesso!", icon="💾")
             novo_aluno = self.obter_novo_aluno()
             self.st.write("🧑", novo_aluno.nome, )
             self.st.write("🪪", novo_aluno.cpf)
-            self.st.write("🗓️", novo_aluno.ano_nascimento)
+            self.st.write("🗓️", novo_aluno.ano_nascimento,
+                          f"({novo_aluno.idade} anos)")
             self.st.write("✉️", novo_aluno.email)
             self.st.write("🛣️", novo_aluno.endereco)
 
@@ -204,7 +212,7 @@ class AlunoApp:
                                key="novo_aluno_email")
 
             self.st.text_input("CEP:",
-                               max_chars=200,
+                               max_chars=8,
                                placeholder="informe somente os numeros do CEP",
                                icon="🛣️",
                                key="novo_aluno_cep")
@@ -275,7 +283,7 @@ class AlunoApp:
             self.st.button("voltar",
                            help="voltar para a listagem de Alunos",
                            on_click=self.ir_para_listar_alunos)
-            self.st.success("Aluno editado com sucesso!")
+            self.st.success("Aluno editado com sucesso!", icon="💾")
             aluno = self.st.session_state.editar_aluno_selecionado
             self.st.subheader(f"🪪 {aluno.cpf}")
             self.st.write("🧑", aluno.nome, )
@@ -312,7 +320,7 @@ class AlunoApp:
                                icon="✉️",
                                key="editar_aluno_email")
             self.st.text_input("CEP:",
-                               max_chars=200,
+                               max_chars=8,
                                placeholder="informe somente os numeros do CEP",
                                icon="🛣️",
                                key="editar_aluno_cep")
@@ -393,7 +401,7 @@ class AlunoApp:
 
             if "excluir_aluno_mensagem" in self.st.session_state and self.st.session_state.excluir_aluno_mensagem:
                 self.st.success(
-                    self.st.session_state.excluir_aluno_mensagem)
+                    self.st.session_state.excluir_aluno_mensagem, icon="🔥")
                 self.st.session_state.excluir_aluno_mensagem = None
 
             alunos = self.aluno_db.listar()
@@ -432,6 +440,10 @@ class AlunoApp:
                         self.st.session_state.excluir_aluno_cpf_erro)
                     self.st.session_state.excluir_aluno_cpf_erro = None
 
+                self.st.write(len(alunos),
+                              "alunos" if len(alunos) > 1 else "aluno",
+                              "cadastrados" if len(alunos) > 1 else "cadastrado")
+
                 self.st.dataframe(alunos)
 
     def exibir_excluir_aluno(self):
@@ -449,7 +461,8 @@ class AlunoApp:
                 self.st.write(
                     f"Você está prestes a excluir o Aluno **{aluno.nome}**")
                 self.st.write("🪪", aluno.cpf)
-                self.st.write("🗓️", aluno.ano_nascimento)
+                self.st.write("🗓️", aluno.ano_nascimento,
+                              f"({aluno.idade} anos)")
                 self.st.write("✉️", aluno.email)
                 self.st.write("🛣️", aluno.endereco)
                 self.st.button("confirmar exclusão", icon="🔥",

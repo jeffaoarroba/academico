@@ -64,7 +64,7 @@ class DisciplinaApp:
         nome_disciplina = self.disciplina_db.obter_nome_disciplina_por_codigo(
             int(codigo))
         self.disciplina_db.excluir_por_codigo(int(codigo))
-        self.st.session_state.excluir_disciplina_mensagem = f"🔥 Disciplina **{nome_disciplina}** excluída com sucesso!"
+        self.st.session_state.excluir_disciplina_mensagem = f"Disciplina **{nome_disciplina}** excluída com sucesso!"
         self.st.session_state.tela = "listar_disciplinas"
 
     # IR PARA TELAS
@@ -86,7 +86,7 @@ class DisciplinaApp:
             return
 
         self.st.session_state.editar_disciplina_selecionado = self.disciplina_db.obter_por_codigo(
-            int(codigo))
+            codigo)
         self.st.session_state.tela = "editar_disciplina"
 
     def ir_para_excluir_disciplina(self):
@@ -109,9 +109,9 @@ class DisciplinaApp:
             self.st.button("voltar",
                            help="voltar para a listagem de Disciplinas",
                            on_click=self.ir_para_listar_disciplinas)
-            self.st.success("Disciplina salvo com sucesso!")
+            self.st.success("Disciplina salvo com sucesso!", icon="💾")
             nova_disciplina = self.obter_nova_disciplina()
-            self.st.write("🪪", self.st.session_state.nova_disciplina_codigo, )
+            self.st.write("🪪", self.st.session_state.nova_disciplina_codigo)
             self.st.write("📘", nova_disciplina.nome, )
             self.st.write("⏳", nova_disciplina.carga_horaria)
             self.st.write("👨‍🏫", nova_disciplina.nome_professor)
@@ -124,10 +124,11 @@ class DisciplinaApp:
                            help="**cancelar** o cadastro da nova Disciplina e voltar para a listagem de Disciplinas")
             self.st.write("Informe os dados da nova Disciplina")
 
-            self.st.write("🪪 Código: _será gerado automaticamente_")
+            self.st.write(
+                "🪪 O **CÓDIGO** da Disciplina será gerado automaticamente")
             self.st.text_input("Nome:",
                                max_chars=200,
-                               placeholder="informe o Nome da nova Disciplina",
+                               placeholder="informe o nome da nova Disciplina",
                                icon="📘",
                                key="nova_disciplina_nome")
             self.st.number_input("Carga horária:",
@@ -137,6 +138,7 @@ class DisciplinaApp:
                                  key="nova_disciplina_carga_horaria")
             self.st.text_input("Professor:",
                                max_chars=200,
+                               placeholder="informe o nome completo do Professor",
                                icon="👨‍🏫",
                                key="nova_disciplina_professor")
 
@@ -154,7 +156,7 @@ class DisciplinaApp:
             self.st.button("voltar",
                            help="voltar para a listagem de Disciplinas",
                            on_click=self.ir_para_listar_disciplinas)
-            self.st.success("Disciplina editado com sucesso!")
+            self.st.success("Disciplina editado com sucesso!", icon="💾")
             disciplina = self.st.session_state.editar_disciplina_selecionado
             self.st.subheader(f"🪪 {disciplina.codigo}")
             self.st.write("📘", disciplina.nome, )
@@ -205,7 +207,7 @@ class DisciplinaApp:
 
             if "excluir_disciplina_mensagem" in self.st.session_state and self.st.session_state.excluir_disciplina_mensagem:
                 self.st.success(
-                    self.st.session_state.excluir_disciplina_mensagem)
+                    self.st.session_state.excluir_disciplina_mensagem, icon="🔥")
                 self.st.session_state.excluir_disciplina_mensagem = None
 
             disciplinas = self.disciplina_db.listar()
@@ -224,12 +226,14 @@ class DisciplinaApp:
                 if clicou_em_editar_disciplina:
                     self.st.chat_input(
                         "📝 para EDITAR uma Disciplina, informe o CODIGO e pressione ENTER",
+                        max_chars=10,
                         on_submit=self.ir_para_editar_disciplina,
                         key="editar_disciplina_codigo",)
 
                 if clicou_em_excluir_disciplina:
                     self.st.chat_input(
                         "🔥 para EXCLUIR uma Disciplina, informe o CODIGO e pressione ENTER",
+                        max_chars=10,
                         on_submit=self.ir_para_excluir_disciplina,
                         key="excluir_disciplina_codigo")
 
@@ -242,6 +246,11 @@ class DisciplinaApp:
                     self.st.error(
                         self.st.session_state.excluir_disciplina_codigo_erro)
                     self.st.session_state.excluir_disciplina_codigo_erro = None
+
+                self.st.write(len(disciplinas),
+                              "disciplinas" if len(
+                                  disciplinas) > 1 else "disciplina",
+                              "cadastradas" if len(disciplinas) > 1 else "cadastrada")
 
                 self.st.dataframe(disciplinas)
 

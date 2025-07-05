@@ -1,7 +1,8 @@
 import streamlit as st
-from banco import aluno_db, disciplina_db
+from banco import aluno_db, disciplina_db, matricula_db
 from .aluno_app import AlunoApp
 from .disciplina_app import DisciplinaApp
+from .matricula_app import MatriculaApp
 
 
 class App:
@@ -33,6 +34,9 @@ class App:
             AlunoApp(st, placeholder, aluno_db).exibir()
         elif st.session_state.menu == "Disciplinas":
             DisciplinaApp(st, placeholder, disciplina_db).exibir()
+        elif st.session_state.menu == "Matrículas":
+            MatriculaApp(st, placeholder, matricula_db,
+                         aluno_db, disciplina_db).exibir()
 
 
 __all__ = ["App"]
