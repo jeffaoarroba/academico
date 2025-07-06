@@ -104,7 +104,7 @@ class DisciplinaApp:
         self.st.session_state.tela = "nova_disciplina"
 
     def ir_para_editar_disciplina(self):
-        print("APP ALUNO ir_para_editar_disciplina")
+        print("APP DISCIPLINA ir_para_editar_disciplina")
 
         self.st.session_state.erros = None
         self.st.session_state.editar_disciplina_erro = None
@@ -163,7 +163,7 @@ class DisciplinaApp:
                 self.st.button("novo disciplina",
                                help="cadastrar uma nova Disciplina",
                                icon="➕",
-                               on_click=self.ir_para_novo_disciplina)
+                               on_click=self.ir_para_nova_disciplina)
 
             self.st.success("Disciplina salvo com sucesso!", icon="💾")
             self.st.write("🪪", self.st.session_state.nova_disciplina_codigo)
