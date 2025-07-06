@@ -43,11 +43,3 @@ class Matricula:
             erros.append("Informe um CPF válido do Aluno")
 
         return erros
-
-
-if __name__ == "__main__":
-    matricula1 = Matricula(
-        codigo_disciplina=-10,
-        cpf_aluno=""
-    )
-    print(matricula1.validar())

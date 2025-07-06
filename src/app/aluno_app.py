@@ -110,8 +110,8 @@ class AlunoApp:
         self.st.session_state.excluir_aluno_erro = None
         self.st.session_state.excluir_aluno_mensagem = None
 
-        cpf = self.st.session_state.excluir_aluno_cpf
-        self.st.session_state.excluir_aluno_cpf = None
+        cpf = self.st.session_state.excluir_aluno_cpf_aoconfirmar
+        self.st.session_state.excluir_aluno_cpf_aoconfirmar = None
 
         nome_aluno = self.aluno_db.obter_nome_aluno_por_cpf(cpf)
         self.aluno_db.excluir_por_cpf(cpf)
@@ -170,6 +170,7 @@ class AlunoApp:
         self.st.session_state.excluir_aluno_mensagem = None
 
         cpf = self.st.session_state.excluir_aluno_cpf
+        self.st.session_state.excluir_aluno_cpf_aoconfirmar = cpf
 
         if not cpf:
             self.st.session_state.excluir_aluno_erro = "🪪 Informe um **CPF** para excluir um Aluno!"
@@ -196,7 +197,9 @@ class AlunoApp:
 
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno")
-            col1, col2, col3 = self.st.columns([1, 1, 3])
+
+            col1, col2 = self.st.columns([1, 2])
+
             with col1:
                 self.st.button("voltar",
                                help="voltar para a listagem de Alunos",
@@ -206,6 +209,7 @@ class AlunoApp:
                                help="cadastrar um novo Aluno",
                                icon="➕",
                                on_click=self.ir_para_novo_aluno)
+
             self.st.success("Aluno salvo com sucesso!", icon="💾")
             self.st.write("🧑", novo_aluno.nome, )
             self.st.write("🪪", novo_aluno.cpf)
@@ -434,6 +438,7 @@ class AlunoApp:
         print("APP ALUNO exibir_listar_alunos")
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno | Lista")
+
             col1, col2, col3 = self.st.columns([1, 1, 2])
             with col1:
                 self.st.button(

@@ -41,7 +41,7 @@ def eh_cpf_valido(cpf):
         print("ERRO UTIL eh_cpf_valido CPF vazio")
         return False
 
-    if not cpf.isdigit():
+    if isinstance(cpf, str) and not cpf.isdigit():
         print("ERRO UTIL eh_cpf_valido", cpf, "isdigit False")
         return False
 

@@ -29,7 +29,7 @@ class DisciplinaDB:
         if not codigo_disciplina:
             return False
 
-        if not codigo_disciplina.isdigit():
+        if isinstance(codigo_disciplina, str) and not codigo_disciplina.isdigit():
             return False
 
         registros = self.db.select(

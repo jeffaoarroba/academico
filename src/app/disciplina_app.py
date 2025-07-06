@@ -254,6 +254,7 @@ class DisciplinaApp:
 
         with self.placeholder.container():
             self.st.subheader("📚 Disciplina | Lista")
+
             col1, col2, col3 = self.st.columns([1, 1, 2])
             with col1:
                 self.st.button(

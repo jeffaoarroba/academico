@@ -37,7 +37,7 @@ class AlunoDB:
         if not cpf:
             return False
 
-        if not cpf.isdigit():
+        if isinstance(cpf, str) and not cpf.isdigit():
             return False
 
         registros = self.db.select(

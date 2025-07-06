@@ -34,9 +34,3 @@ class Aluno:
             erros.append("🛣️ Informe o **ENDEREÇO** do Aluno")
 
         return erros
-
-
-if __name__ == "__main__":
-    aluno1 = Aluno("01234567890", "JEUDI", 1985,
-                   "jeudiprando@gmail.com", "Centro, Domingos Martins - ES")
-    print(aluno1.validar())

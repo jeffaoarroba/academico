@@ -267,6 +267,7 @@ class MatriculaApp:
 
         with self.placeholder.container():
             self.st.subheader("📝🎓 Matricula | Lista")
+
             col1, col2 = self.st.columns([1, 3])
             with col1:
                 self.st.button(
@@ -290,6 +291,7 @@ class MatriculaApp:
                 if self.st.session_state.exibir_cancelar_matricula:
                     self.st.write(
                         "Informe o **CODIGO** da Disciplina e o **CPF** do Aluno para cancelar uma Matricula")
+
                     cancelar_matricula_col1, cancelar_matricula_col2 = self.st.columns([
                                                                                        1, 1])
                     with cancelar_matricula_col1:
