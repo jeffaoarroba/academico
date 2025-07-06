@@ -1,3 +1,6 @@
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 from tipo.disciplina import Disciplina
 
 
@@ -24,6 +27,9 @@ class DisciplinaDB:
 
     def verificar_codigo_em_uso(self, codigo_disciplina):
         if not codigo_disciplina:
+            return False
+
+        if not codigo_disciplina.isdigit():
             return False
 
         registros = self.db.select(

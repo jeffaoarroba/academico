@@ -1,3 +1,6 @@
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 def gerar_endereco_completo(logradouro, bairro, cidade, uf, cep):
     """
     Gera o endereço completo.
@@ -7,18 +10,18 @@ def gerar_endereco_completo(logradouro, bairro, cidade, uf, cep):
     # remove os valores vazios e junta os valores com vírgula,
     # e transforma os valores em letras maiúsculas.
     endereco = ", ".join(list(filter(None, [
-        logradouro.upper() if logradouro else None,
-        bairro.upper() if bairro else None,
-        cidade.upper() if cidade else None,
+        logradouro if logradouro else None,
+        bairro if bairro else None,
+        cidade if cidade else None,
     ]))).strip(", ").strip()
 
     # concatena o valor gerado anteriormente com uf e cep
     # se uf e cep forem informados, adiciona um separador
     endereco_completo = endereco + (" - " if endereco and uf else "") + (
-        uf.upper() if uf else "") + (" CEP:" + cep if cep else "")
+        uf if uf else "") + (" CEP:" + cep if cep else "")
 
     # e retorna um valor com o endereço completo.
-    return endereco_completo
+    return endereco_completo.upper()
 
 
 def eh_cpf_valido(cpf):
@@ -35,7 +38,11 @@ def eh_cpf_valido(cpf):
     print("UTIL eh_cpf_valido", cpf)
 
     if not cpf:
-        print("ERRO ALUNO validar CPF vazio")
+        print("ERRO UTIL eh_cpf_valido CPF vazio")
+        return False
+
+    if not cpf.isdigit():
+        print("ERRO UTIL eh_cpf_valido", cpf, "isdigit False")
         return False
 
     # preenche com zeros a esquerda um CPF que tenha menos de 11 digitos

@@ -1,3 +1,6 @@
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 from .banco_dados import BancoDados
 from .aluno_db import AlunoDB
 from .disciplina_db import DisciplinaDB

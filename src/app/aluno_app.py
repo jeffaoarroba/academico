@@ -1,3 +1,6 @@
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 from datetime import datetime
 from banco.aluno_db import AlunoDB
 from tipo.aluno import Aluno
@@ -11,6 +14,18 @@ class AlunoApp:
         self.st = st
         self.placeholder = placeholder
         self.aluno_db = aluno_db
+
+        if not "excluir_aluno_erro" in self.st.session_state:
+            self.st.session_state.excluir_aluno_erro = None
+        if not "excluir_aluno_mensagem" in self.st.session_state:
+            self.st.session_state.excluir_aluno_mensagem = None
+        if not "editar_aluno_erro" in self.st.session_state:
+            self.st.session_state.editar_aluno_erro = None
+        if "editar_aluno_erro_cep" in self.st.session_state:
+            self.st.session_state.editar_aluno_erro_cep = None
+
+        # debug de variaveis de sessao
+        # self.st.write(self.st.session_state)
 
     # NOVO ALUNO
 
@@ -32,22 +47,30 @@ class AlunoApp:
         )
 
     def novo_aluno_salvar(self):
-        print("APP ALUNO clicou em salvar novo aluno")
+        print("APP ALUNO clicou em novo_aluno_salvar")
+
         novo_aluno = self.obter_novo_aluno()
+
         erros = novo_aluno.validar()
+
         cpf_ja_existe = self.aluno_db.verificar_cpf_em_uso(novo_aluno.cpf)
         if cpf_ja_existe:
             erros.insert(0, "🪪 O **CPF** informado já está sendo utilizado")
+
+        # TODO verificar se jah existe um aluno cadastrado com o mesmo nome, avisar o usuario e nao impedir o cadastro do aluno
+        self.st.session_state.erros = erros
+
         if not erros:
             self.aluno_db.cadastrar(novo_aluno)
             self.st.session_state.tela = "novo_aluno_sucesso"
-        self.st.session_state.erros = erros
 
     # EDITAR ALUNO
 
     def editar_aluno_salvar(self):
-        print("APP ALUNO clicou em salvar editar aluno")
+        print("APP ALUNO clicou em editar_aluno_salvar")
+
         aluno = self.st.session_state.editar_aluno_selecionado
+
         if self.st.session_state.editar_aluno_nome:
             aluno.nome = self.st.session_state.editar_aluno_nome.upper()
         if self.st.session_state.editar_aluno_ano:
@@ -55,9 +78,9 @@ class AlunoApp:
                 self.st.session_state.editar_aluno_ano)
         if self.st.session_state.editar_aluno_email:
             aluno.email = self.st.session_state.editar_aluno_email.upper()
-        if self.st.session_state.editar_aluno_cep and not self.st.session_state.editar_aluno_cep_erro and self.st.session_state.editar_aluno_endereco:
+        if self.st.session_state.editar_aluno_cep and not self.st.session_state.editar_aluno_erro_cep and self.st.session_state.editar_aluno_endereco:
             aluno.endereco = self.st.session_state.editar_aluno_endereco
-        if self.st.session_state.editar_aluno_cep_erro and not self.st.session_state.editar_aluno_endereco and (
+        if self.st.session_state.editar_aluno_erro_cep and not self.st.session_state.editar_aluno_endereco and (
                 self.st.session_state.editar_aluno_logradouro or
                 self.st.session_state.editar_aluno_bairro or
                 self.st.session_state.editar_aluno_cidade or
@@ -71,8 +94,10 @@ class AlunoApp:
                 self.st.session_state.editar_aluno_estado,
                 self.st.session_state.editar_aluno_cep
             )
+
         erros = aluno.validar()
         self.st.session_state.erros = erros
+
         if not erros:
             self.aluno_db.atualizar(aluno)
             self.st.session_state.tela = "editar_aluno_sucesso"
@@ -80,76 +105,84 @@ class AlunoApp:
     # EXCLUIR ALUNO
 
     def excluir_aluno(self):
-        print("APP ALUNO clicou em excluir aluno")
-        cpf = self.st.session_state.excluir_aluno_cpf_aoconfirmar
-        if not cpf:
-            self.st.session_state.excluir_aluno_cpf_erro = "🪪 Informe um CPF válido para excluir um Aluno!"
-            return
+        print("APP ALUNO clicou em excluir_aluno")
 
-        eh_cpf_valido = eh_cpf_valido(cpf)
-        if not eh_cpf_valido:
-            self.st.session_state.excluir_aluno_cpf_erro = "🪪 Informe um CPF válido para excluir um Aluno!"
-            return
+        self.st.session_state.excluir_aluno_erro = None
+        self.st.session_state.excluir_aluno_mensagem = None
 
-        eh_cpf_em_uso = self.aluno_db.verificar_cpf_em_uso(cpf)
-        if not eh_cpf_em_uso:
-            self.st.session_state.excluir_aluno_cpf_erro = "🪪 Nenhum Aluno encontrado com o CPF informado."
-            return
+        cpf = self.st.session_state.excluir_aluno_cpf
+        self.st.session_state.excluir_aluno_cpf = None
 
-        nome_aluno = self.aluno_db.obter_nome_aluno_por_cpf(int(cpf))
-        self.aluno_db.excluir_por_cpf(int(cpf))
+        nome_aluno = self.aluno_db.obter_nome_aluno_por_cpf(cpf)
+        self.aluno_db.excluir_por_cpf(cpf)
         self.st.session_state.excluir_aluno_mensagem = f"Aluno **{nome_aluno}** excluído com sucesso!"
-        self.st.session_state.tela = "listar_alunos"
+
+        self.ir_para_listar_alunos()
 
     # IR PARA TELAS
 
     def ir_para_listar_alunos(self):
         print("APP ALUNO ir_para_listar_alunos")
-        self.st.session_state.editar_aluno_cpf_erro = None
-        self.st.session_state.excluir_aluno_cpf_erro = None
-        self.st.session_state.excluir_aluno_cpf_aoconfirmar = None
+
+        self.st.session_state.editar_aluno_cpf = None
+        self.st.session_state.excluir_aluno_cpf = None
+
         self.st.session_state.tela = "listar_alunos"
 
     def ir_para_novo_aluno(self):
         print("APP ALUNO ir_para_novo_aluno")
-        self.st.session_state.novo_aluno_cep_erro = False
-        self.st.session_state.novo_aluno_endereco = ""
+
+        self.st.session_state.erros = None
+        self.st.session_state.novo_aluno_cep_erro = None
+        self.st.session_state.novo_aluno_endereco = None
+
         self.st.session_state.tela = "novo_aluno"
 
     def ir_para_editar_aluno(self):
         print("APP ALUNO ir_para_editar_aluno")
-        self.st.session_state.editar_aluno_cep_erro = False
-        self.st.session_state.editar_aluno_endereco = ""
+
+        self.st.session_state.erros = None
+        self.st.session_state.editar_aluno_erro = None
+        self.st.session_state.editar_aluno_erro_cep = None
+        self.st.session_state.editar_aluno_endereco = None
 
         cpf = self.st.session_state.editar_aluno_cpf
+
         eh_cpf_valido_valor = eh_cpf_valido(cpf)
         if not eh_cpf_valido_valor:
-            self.st.session_state.editar_aluno_cpf_erro = "🪪 Informe um CPF válido para editar um Aluno!"
+            self.st.session_state.editar_aluno_erro = "🪪 Informe um CPF válido para editar um Aluno!"
             return
 
         eh_cpf_em_uso = self.aluno_db.verificar_cpf_em_uso(cpf)
         if not eh_cpf_em_uso:
-            self.st.session_state.editar_aluno_cpf_erro = "🪪 Nenhum Aluno encontrado com o CPF informado."
+            self.st.session_state.editar_aluno_erro = "🪪 Nenhum Aluno encontrado com o CPF informado!"
             return
 
-        self.st.session_state.editar_aluno_selecionado = self.aluno_db.obter_por_cpf(
-            cpf)
+        aluno = self.aluno_db.obter_por_cpf(cpf)
+        self.st.session_state.editar_aluno_selecionado = aluno
+
         self.st.session_state.tela = "editar_aluno"
 
     def ir_para_excluir_aluno(self):
         print("APP ALUNO ir_para_excluir_aluno")
-        self.st.session_state.excluir_aluno_cpf_confirmado = None
-        self.st.session_state.excluir_aluno_cpf_erro = None
+
+        self.st.session_state.excluir_aluno_erro = None
+        self.st.session_state.excluir_aluno_mensagem = None
+
         cpf = self.st.session_state.excluir_aluno_cpf
+
+        if not cpf:
+            self.st.session_state.excluir_aluno_erro = "🪪 Informe um **CPF** para excluir um Aluno!"
+            return
 
         eh_cpf_valido_valor = eh_cpf_valido(cpf)
         if not eh_cpf_valido_valor:
-            self.st.session_state.excluir_aluno_cpf_erro = "🪪 Informe um CPF válido para excluir um Aluno!"
+            self.st.session_state.excluir_aluno_erro = "🪪 Informe um **CPF VÁLIDO** para excluir um Aluno!"
             return
 
         eh_cpf_em_uso = self.aluno_db.verificar_cpf_em_uso(cpf)
         if not eh_cpf_em_uso:
-            self.st.session_state.excluir_aluno_cpf_erro = "🪪 Nenhum Aluno encontrado com o CPF informado."
+            self.st.session_state.excluir_aluno_erro = "🪪 **NENHUM ALUNO ENCONTRADO** com o CPF informado!"
             return
 
         self.st.session_state.tela = "excluir_aluno"
@@ -158,6 +191,9 @@ class AlunoApp:
 
     def exibir_novo_aluno_sucesso(self):
         print("APP ALUNO exibir_novo_aluno_sucesso")
+
+        novo_aluno = self.obter_novo_aluno()
+
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno")
             col1, col2, col3 = self.st.columns([1, 1, 3])
@@ -171,7 +207,6 @@ class AlunoApp:
                                icon="➕",
                                on_click=self.ir_para_novo_aluno)
             self.st.success("Aluno salvo com sucesso!", icon="💾")
-            novo_aluno = self.obter_novo_aluno()
             self.st.write("🧑", novo_aluno.nome, )
             self.st.write("🪪", novo_aluno.cpf)
             self.st.write("🗓️", novo_aluno.ano_nascimento,
@@ -181,6 +216,7 @@ class AlunoApp:
 
     def exibir_novo_aluno(self):
         print("APP ALUNO exibir_novo_aluno")
+
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno | Novo")
             # os asteriscos em help=**cancelar** aplica o estilo negrito (markdown)
@@ -220,8 +256,8 @@ class AlunoApp:
             clicou_em_consultar_cep = self.st.button("consultar CEP", icon="🔎")
 
             if clicou_em_consultar_cep:
-                self.st.session_state.novo_aluno_cep_erro = False
-                self.st.session_state.novo_aluno_endereco = ""
+                self.st.session_state.novo_aluno_cep_erro = None
+                self.st.session_state.novo_aluno_endereco = None
                 try:
                     if self.st.session_state.novo_aluno_cep:
                         print("APP ALUNOS NOVO_ALUNO consultar_cep",
@@ -240,7 +276,7 @@ class AlunoApp:
                             # self.st.write(consulta_cep['endereco_completo'])
                     else:
                         print("APP ALUNOS NOVO_ALUNO cep não informado")
-                        self.st.session_state.novo_aluno_cep_erro = "🛣️ CEP não informado"
+                        self.st.session_state.novo_aluno_cep_erro = "🛣️ CEP não informado!"
                 except Exception as e:
                     print("ERRO APP ALUNOS NOVO_ALUNO consultar_cep", e)
                     self.st.session_state.novo_aluno_cep_erro = e
@@ -271,20 +307,22 @@ class AlunoApp:
 
             self.st.button("salvar", icon="💾", on_click=self.novo_aluno_salvar)
 
-            if "erros" in self.st.session_state and self.st.session_state.erros:
-                for erro in self.st.session_state.erros:
-                    self.st.error(erro)
+            if self.st.session_state.erros:
+                for item_erro in self.st.session_state.erros:
+                    self.st.error(item_erro)
                 self.st.session_state.erros = None
 
     def exibir_editar_aluno_sucesso(self):
         print("APP ALUNO exibir_editar_aluno_sucesso")
+
+        aluno = self.st.session_state.editar_aluno_selecionado
+
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno")
             self.st.button("voltar",
                            help="voltar para a listagem de Alunos",
                            on_click=self.ir_para_listar_alunos)
             self.st.success("Aluno editado com sucesso!", icon="💾")
-            aluno = self.st.session_state.editar_aluno_selecionado
             self.st.subheader(f"🪪 {aluno.cpf}")
             self.st.write("🧑", aluno.nome, )
             self.st.write("🗓️", aluno.ano_nascimento)
@@ -293,6 +331,7 @@ class AlunoApp:
 
     def exibir_editar_aluno(self):
         print("APP ALUNO exibir_editar_aluno")
+
         aluno = self.st.session_state.editar_aluno_selecionado
 
         with self.placeholder.container():
@@ -303,6 +342,7 @@ class AlunoApp:
             self.st.subheader(f"🪪 {aluno.cpf} {aluno.nome}")
             self.st.write(
                 "Preencha somente as informações que deseja alterar e clique em **salvar**")
+
             self.st.text_input("Nome:", max_chars=200,
                                placeholder="informe o nome completo do Aluno",
                                icon="🧑",
@@ -328,8 +368,8 @@ class AlunoApp:
             clicou_em_consultar_cep = self.st.button("consultar CEP", icon="🔎")
 
             if clicou_em_consultar_cep:
-                self.st.session_state.editar_aluno_cep_erro = False
-                self.st.session_state.editar_aluno_endereco = ""
+                self.st.session_state.editar_aluno_erro_cep = None
+                self.st.session_state.editar_aluno_endereco = None
                 try:
                     if self.st.session_state.editar_aluno_cep:
                         print("APP ALUNOS EDITAR_ALUNO consultar_cep",
@@ -339,7 +379,7 @@ class AlunoApp:
                         if consulta_cep['erro']:
                             print("ERRO APP ALUNOS EDITAR_ALUNO consultar_cep",
                                   consulta_cep['erro'])
-                            self.st.session_state.editar_aluno_cep_erro = consulta_cep['erro']
+                            self.st.session_state.editar_aluno_erro_cep = consulta_cep['erro']
                         else:
                             print("APP ALUNOS EDITAR_ALUNO endereco_completo",
                                   consulta_cep['endereco_completo'])
@@ -348,18 +388,18 @@ class AlunoApp:
                             # self.st.write(consulta_cep['endereco_completo'])
                     else:
                         print("APP ALUNOS EDITAR_ALUNO cep não informado")
-                        self.st.session_state.editar_aluno_cep_erro = "🛣️ CEP não informado"
+                        self.st.session_state.editar_aluno_erro_cep = "🛣️ CEP não informado!"
                 except Exception as e:
                     print("ERRO APP ALUNOS EDITAR_ALUNO consultar_cep", e)
-                    self.st.session_state.editar_aluno_cep_erro = e
+                    self.st.session_state.editar_aluno_erro_cep = e
 
-                if not self.st.session_state.editar_aluno_cep_erro:
+                if not self.st.session_state.editar_aluno_erro_cep:
                     self.st.text_input("Endereço",
                                        disabled=True,
                                        value=self.st.session_state.editar_aluno_endereco)
 
-            if self.st.session_state.editar_aluno_cep_erro:
-                self.st.error(self.st.session_state.editar_aluno_cep_erro)
+            if self.st.session_state.editar_aluno_erro_cep:
+                self.st.error(self.st.session_state.editar_aluno_erro_cep)
                 self.st.write(
                     """
                     Para não atualizar o **Endereço do Aluno**, deixe todos os campos abaixo em branco
@@ -385,9 +425,9 @@ class AlunoApp:
                            icon="💾",
                            on_click=self.editar_aluno_salvar)
 
-            if "erros" in self.st.session_state and self.st.session_state.erros:
-                for erro in self.st.session_state.erros:
-                    self.st.error(erro)
+            if self.st.session_state.erros:
+                for item_erro in self.st.session_state.erros:
+                    self.st.error(item_erro)
                 self.st.session_state.erros = None
 
     def exibir_listar_alunos(self):
@@ -399,7 +439,7 @@ class AlunoApp:
                 self.st.button(
                     "novo aluno", on_click=self.ir_para_novo_aluno, icon="➕")
 
-            if "excluir_aluno_mensagem" in self.st.session_state and self.st.session_state.excluir_aluno_mensagem:
+            if self.st.session_state.excluir_aluno_mensagem:
                 self.st.success(
                     self.st.session_state.excluir_aluno_mensagem, icon="🔥")
                 self.st.session_state.excluir_aluno_mensagem = None
@@ -417,12 +457,14 @@ class AlunoApp:
                     clicou_em_excluir_aluno = self.st.button("excluir aluno",
                                                              icon="🔥",
                                                              help="inicia o processo de 🔥 **EXCLUIR** um Aluno",)
+
                 if clicou_em_editar_aluno:
                     self.st.chat_input(
                         "📝 para EDITAR um aluno, informe o CPF e pressione ENTER",
                         max_chars=11,
                         on_submit=self.ir_para_editar_aluno,
                         key="editar_aluno_cpf",)
+
                 if clicou_em_excluir_aluno:
                     self.st.chat_input(
                         "🔥 para EXCLUIR um aluno, informe o CPF e pressione ENTER",
@@ -430,15 +472,15 @@ class AlunoApp:
                         on_submit=self.ir_para_excluir_aluno,
                         key="excluir_aluno_cpf")
 
-                if "editar_aluno_cpf_erro" in self.st.session_state and self.st.session_state.editar_aluno_cpf_erro:
+                if self.st.session_state.editar_aluno_erro:
                     self.st.error(
-                        self.st.session_state.editar_aluno_cpf_erro)
-                    self.st.session_state.editar_aluno_cpf_erro = None
+                        self.st.session_state.editar_aluno_erro)
+                    self.st.session_state.editar_aluno_erro = None
 
-                if "excluir_aluno_cpf_erro" in self.st.session_state and self.st.session_state.excluir_aluno_cpf_erro:
+                if self.st.session_state.excluir_aluno_erro:
                     self.st.error(
-                        self.st.session_state.excluir_aluno_cpf_erro)
-                    self.st.session_state.excluir_aluno_cpf_erro = None
+                        self.st.session_state.excluir_aluno_erro)
+                    self.st.session_state.excluir_aluno_erro = None
 
                 self.st.write(len(alunos),
                               "alunos" if len(alunos) > 1 else "aluno",
@@ -448,25 +490,26 @@ class AlunoApp:
 
     def exibir_excluir_aluno(self):
         print("APP ALUNO exibir_excluir_aluno")
+
         cpf = self.st.session_state.excluir_aluno_cpf
-        self.st.session_state.excluir_aluno_cpf_aoconfirmar = cpf
-        aluno = self.aluno_db.obter_por_cpf(int(cpf))
+        aluno = self.aluno_db.obter_por_cpf(cpf)
 
         with self.placeholder.container():
             self.st.subheader("🧑‍🎓 Aluno | Excluir")
             self.st.button("voltar",
                            help="**cancelar** a exclusão do Aluno e voltar para a listagem de Alunos",
                            on_click=self.ir_para_listar_alunos)
-            if aluno:
-                self.st.write(
-                    f"Você está prestes a excluir o Aluno **{aluno.nome}**")
-                self.st.write("🪪", aluno.cpf)
-                self.st.write("🗓️", aluno.ano_nascimento,
-                              f"({aluno.idade} anos)")
-                self.st.write("✉️", aluno.email)
-                self.st.write("🛣️", aluno.endereco)
-                self.st.button("confirmar exclusão", icon="🔥",
-                               on_click=self.excluir_aluno)
+            self.st.write(
+                f"Você está prestes a excluir o Aluno **{aluno.nome}**")
+
+            self.st.write("🪪", aluno.cpf)
+            self.st.write("🗓️", aluno.ano_nascimento,
+                          f"({aluno.idade} anos)")
+            self.st.write("✉️", aluno.email)
+            self.st.write("🛣️", aluno.endereco)
+
+            self.st.button("confirmar exclusão", icon="🔥",
+                           on_click=self.excluir_aluno)
 
     # EXIBIR PRINCIPAL
 
@@ -483,6 +526,3 @@ class AlunoApp:
             self.exibir_excluir_aluno()
         else:  # listar_alunos
             self.exibir_listar_alunos()
-
-        # debug de variaveis de sessao
-        # self.st.write(self.st.session_state)

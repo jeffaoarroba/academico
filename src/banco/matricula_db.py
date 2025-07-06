@@ -1,3 +1,6 @@
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 from tipo.matricula import Matricula
 
 

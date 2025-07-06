@@ -1,3 +1,6 @@
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 from datetime import datetime
 from util import eh_cpf_valido
 
@@ -9,8 +12,9 @@ class Matricula:
                  codigo_disciplina, cpf_aluno, matriculado_em=None,
                  nome_disciplina=None, carga_horaria_disciplina=None, nome_professor_disciplina=None,
                  nome_aluno=None, email_aluno=None, endereco_aluno=None):
-        self.codigo_disciplina = int(codigo_disciplina)
-        self.cpf_aluno = int(cpf_aluno)
+        self.codigo_disciplina = int(
+            codigo_disciplina) if codigo_disciplina else None
+        self.cpf_aluno = int(cpf_aluno) if cpf_aluno else None
         self.matriculado_em = matriculado_em if matriculado_em else datetime.now()
 
         # Informacoes da disciplina

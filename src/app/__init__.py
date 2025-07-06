@@ -1,3 +1,6 @@
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 import streamlit as st
 from banco import aluno_db, disciplina_db, matricula_db
 from .aluno_app import AlunoApp

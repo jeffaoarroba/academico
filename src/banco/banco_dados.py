@@ -1,3 +1,6 @@
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 import sqlite3
 
 
@@ -31,7 +34,8 @@ class BancoDados:
             self.conexao.commit()
 
     def executar(self, sql, parametros=None):
-        if not sql: return
+        if not sql:
+            return
         if not self.cursor:
             self.conectar()
         if not parametros:

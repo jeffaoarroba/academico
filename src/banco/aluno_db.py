@@ -1,3 +1,6 @@
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 from tipo.aluno import Aluno
 
 
@@ -32,6 +35,9 @@ class AlunoDB:
 
     def verificar_cpf_em_uso(self, cpf):
         if not cpf:
+            return False
+
+        if not cpf.isdigit():
             return False
 
         registros = self.db.select(

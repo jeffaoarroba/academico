@@ -1,7 +1,7 @@
-from datetime import datetime
-from banco.matricula_db import MatriculaDB
-from banco.disciplina_db import DisciplinaDB
-from banco.aluno_db import AlunoDB
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
+from banco import MatriculaDB, DisciplinaDB, AlunoDB
 from tipo.matricula import Matricula
 from util import eh_cpf_valido
 
@@ -14,10 +14,18 @@ class MatriculaApp:
         self.matricula_db = matricula_db
         self.aluno_db = aluno_db
         self.disciplina_db = disciplina_db
-        if "cancelar_matricula_erro" in self.st.session_state:
+
+        if not "cancelar_matricula_erro" in self.st.session_state:
             self.st.session_state.cancelar_matricula_erro = None
+        if not "cancelar_matricula_mensagem" in self.st.session_state:
+            self.st.session_state.cancelar_matricula_mensagem = None
         if not "exibir_cancelar_matricula" in self.st.session_state:
-            self.st.session_state.exibir_cancelar_matricula = False
+            self.st.session_state.exibir_cancelar_matricula = None
+        if not "nova_matricula_disciplina" in self.st.session_state:
+            self.st.session_state.nova_matricula_disciplina = None
+        if not "nova_matricula_aluno" in self.st.session_state:
+            self.st.session_state.nova_matricula_aluno = None
+
         # debug de variaveis de sessao
         # self.st.write(self.st.session_state)
 
@@ -73,10 +81,13 @@ class MatriculaApp:
     def nova_matricula_salvar(self):
         print("APP MATRICULA clicou em nova_matricula_salvar")
         nova_matricula = self.obter_nova_matricula()
+
         erros = nova_matricula.validar()
+
         if not erros:
             self.matricula_db.cadastrar(nova_matricula)
             self.st.session_state.tela = "nova_matricula_sucesso"
+
         self.st.session_state.erros = erros
 
     # CANCELAR MATRICULA
@@ -84,37 +95,14 @@ class MatriculaApp:
     def alternar_cancelar_matricula(self):
         self.st.session_state.exibir_cancelar_matricula = not self.st.session_state.exibir_cancelar_matricula
 
-    def clicou_em_cancelar_matricula_voltar(self):
-        self.alternar_cancelar_matricula()
+    def cancelar_matricula_voltar(self):
+        print("APP MATRICULA clicou em cancelar_matricula_voltar")
+
+        self.st.session_state.exibir_cancelar_matricula = False
         self.ir_para_listar_matriculas()
 
-    def clicou_em_cancelar_matricula_continuar(self):
-        self.st.session_state.cancelar_matricula_erro = None
-        codigo_disciplina = self.st.session_state.cancelar_matricula_codigo_disciplina
-        cpf_aluno = self.st.session_state.cancelar_matricula_cpf_aluno
-
-        if not codigo_disciplina:
-            self.st.session_state.cancelar_matricula_erro = "🪪❓ Informe o **CODIGO** da Disciplina para cancelar uma Matricula."
-            return
-        if not cpf_aluno:
-            self.st.session_state.cancelar_matricula_erro = "🪪❓ Informe o **CPF** do Aluno para cancelar uma Matricula."
-            return
-        if not int(codigo_disciplina) > 0:
-            self.st.session_state.cancelar_matricula_erro = "🪪❓ Informe um **CODIGO** válido da Disciplina para cancelar uma Matricula."
-            return
-        if not eh_cpf_valido(cpf_aluno):
-            self.st.session_state.cancelar_matricula_erro = "🪪❓ Informe um **CPF** válido do Aluno para cancelar uma Matricula."
-            return
-        estah_em_uso = self.matricula_db.verificar_em_uso(
-            codigo_disciplina, cpf_aluno)
-        if not estah_em_uso:
-            self.st.session_state.cancelar_matricula_erro = "🪪❓ Nenhuma Matricula encontrada."
-            return
-
-        self.st.session_state.tela = "cancelar_matricula"
-
     def cancelar_matricula(self):
-        print("APP MATRICULA clicou em continuar_cancelar_matricula")
+        print("APP MATRICULA clicou em cancelar_matricula")
 
         codigo_disciplina = self.st.session_state.cancelar_matricula_codigo_disciplina_aoconfirmar
         cpf_aluno = self.st.session_state.cancelar_matricula_cpf_aluno_aoconfirmar
@@ -124,31 +112,73 @@ class MatriculaApp:
 
         self.matricula_db.excluir_por(codigo_disciplina, cpf_aluno)
         self.st.session_state.cancelar_matricula_mensagem = f"🔥 Matricula excluída com sucesso!"
-        self.alternar_cancelar_matricula()
-        self.st.session_state.tela = "listar_matriculas"
+
+        self.ir_para_listar_matriculas()
 
     # IR PARA TELAS
 
     def ir_para_listar_matriculas(self):
+        print("APP MATRICULA clicou em ir_para_listar_matriculas")
+
         self.st.session_state.tela = "listar_matriculas"
 
     def ir_para_nova_matricula(self):
+        print("APP MATRICULA clicou em ir_para_nova_matricula")
+
+        self.st.session_state.erros = None
         self.st.session_state.nova_matricula_aluno = None
         self.st.session_state.nova_matricula_disciplina = None
+
         self.st.session_state.tela = "nova_matricula"
+
+    def ir_para_cancelar_matricula(self):
+        print("APP MATRICULA clicou em ir_para_cancelar_matricula")
+
+        self.st.session_state.cancelar_matricula_erro = None
+        self.st.session_state.cancelar_matricula_mensagem = None
+
+        codigo_disciplina = self.st.session_state.cancelar_matricula_codigo_disciplina
+        cpf_aluno = self.st.session_state.cancelar_matricula_cpf_aluno
+
+        if not codigo_disciplina:
+            self.st.session_state.cancelar_matricula_erro = "🪪❓ Informe o **CODIGO** da Disciplina para cancelar uma Matricula."
+            return
+
+        if not cpf_aluno:
+            self.st.session_state.cancelar_matricula_erro = "🪪❓ Informe o **CPF** do Aluno para cancelar uma Matricula."
+            return
+
+        if not int(codigo_disciplina) > 0:
+            self.st.session_state.cancelar_matricula_erro = "🪪❓ Informe um **CODIGO** válido da Disciplina para cancelar uma Matricula."
+            return
+
+        if not eh_cpf_valido(cpf_aluno):
+            self.st.session_state.cancelar_matricula_erro = "🪪❓ Informe um **CPF** válido do Aluno para cancelar uma Matricula."
+            return
+
+        estah_em_uso = self.matricula_db.verificar_em_uso(
+            codigo_disciplina, cpf_aluno)
+        if not estah_em_uso:
+            self.st.session_state.cancelar_matricula_erro = "🪪❓ Nenhuma Matricula encontrada."
+            return
+
+        self.st.session_state.tela = "cancelar_matricula"
 
     # EXIBIR TELAS
 
     def exibir_nova_matricula_sucesso(self):
+        print("APP MATRICULA clicou em exibir_nova_matricula_sucesso")
+
+        nova_matricula = self.matricula_db.obter_por(
+            self.st.session_state.nova_matricula_codigo_disciplina,
+            self.st.session_state.nova_matricula_cpf_aluno)
+
         with self.placeholder.container():
             self.st.subheader("📝🎓 Matricula")
             self.st.button("voltar",
                            help="voltar para a listagem de matriculas",
                            on_click=self.ir_para_listar_matriculas)
             self.st.success("Matricula salvo com sucesso!", icon="💾")
-            nova_matricula = self.matricula_db.obter_por(
-                self.st.session_state.nova_matricula_codigo_disciplina,
-                self.st.session_state.nova_matricula_cpf_aluno)
             self.st.write("**MATRICULA**")
             self.st.write("📘", nova_matricula.nome_disciplina, )
             self.st.write("👨‍🏫", nova_matricula.nome_professor_disciplina)
@@ -159,6 +189,8 @@ class MatriculaApp:
             self.st.write("🛣️", nova_matricula.endereco_aluno)
 
     def exibir_nova_matricula(self):
+        print("APP MATRICULA clicou em exibir_nova_matricula")
+
         with self.placeholder.container():
             self.st.subheader("📝🎓 Matricula | Nova")
             # os asteriscos em help=**cancelar** aplica o estilo negrito (markdown)
@@ -183,7 +215,7 @@ class MatriculaApp:
             self.st.button("verificar dados", icon="🔍",
                            on_click=self.nova_matricula_verificar_dados)
 
-            if "erros" in self.st.session_state and self.st.session_state.erros:
+            if self.st.session_state.erros:
                 for erro in self.st.session_state.erros:
                     self.st.error(erro)
                 self.st.session_state.erros = None
@@ -191,7 +223,7 @@ class MatriculaApp:
             disciplina = None
             aluno = None
 
-            if "nova_matricula_disciplina" in self.st.session_state and self.st.session_state.nova_matricula_disciplina:
+            if self.st.session_state.nova_matricula_disciplina:
                 disciplina = self.st.session_state.nova_matricula_disciplina
                 self.st.subheader(f"📘 {disciplina.nome}")
                 #
@@ -201,7 +233,7 @@ class MatriculaApp:
                 self.st.write(f"⏳ `{disciplina.carga_horaria}` horas")
                 self.st.write("👨‍🏫", disciplina.nome_professor)
 
-            if "nova_matricula_aluno" in self.st.session_state and self.st.session_state.nova_matricula_aluno:
+            if self.st.session_state.nova_matricula_aluno:
                 aluno = self.st.session_state.nova_matricula_aluno
                 self.st.subheader(f"🧑‍🎓 {aluno.nome}")
                 #
@@ -222,14 +254,17 @@ class MatriculaApp:
                 )
 
             if not matricula_em_uso:
-                self.st.button("salvar nova matricula", icon="💾",
-                               disabled=matricula_em_uso,
-                               on_click=self.nova_matricula_salvar)
+                if self.st.session_state.nova_matricula_disciplina and self.st.session_state.nova_matricula_aluno:
+                    self.st.button("salvar nova matricula", icon="💾",
+                                   disabled=matricula_em_uso,
+                                   on_click=self.nova_matricula_salvar)
             else:
                 self.st.warning(
-                    "⚠️ O Aluno jah estah Matriculado nessa Disciplina")
+                    "⚠️ O Aluno **JÁ ESTÁ MATRICULADO** nessa Disciplina")
 
     def exibir_listar_matriculas(self):
+        print("APP MATRICULA clicou em exibir_listar_matriculas")
+
         with self.placeholder.container():
             self.st.subheader("📝🎓 Matricula | Lista")
             col1, col2 = self.st.columns([1, 3])
@@ -237,7 +272,7 @@ class MatriculaApp:
                 self.st.button(
                     "nova matricula", on_click=self.ir_para_nova_matricula, icon="➕")
 
-            if "cancelar_matricula_mensagem" in self.st.session_state and self.st.session_state.cancelar_matricula_mensagem:
+            if self.st.session_state.cancelar_matricula_mensagem:
                 self.st.success(
                     self.st.session_state.cancelar_matricula_mensagem)
                 self.st.session_state.cancelar_matricula_mensagem = None
@@ -267,13 +302,14 @@ class MatriculaApp:
                             "CPF do Aluno",
                             max_chars=11,
                             key="cancelar_matricula_cpf_aluno")
+
                     self.st.button(
                         "continuar",
                         help="validar os dados informados e exibir a **MATRICULA** encontrada",
                         icon="🔥",
-                        on_click=self.clicou_em_cancelar_matricula_continuar)
+                        on_click=self.ir_para_cancelar_matricula)
 
-                if "cancelar_matricula_erro" in self.st.session_state and self.st.session_state.cancelar_matricula_erro:
+                if self.st.session_state.cancelar_matricula_erro:
                     self.st.error(
                         self.st.session_state.cancelar_matricula_erro)
                     self.st.session_state.cancelar_matricula_erro = None
@@ -286,11 +322,14 @@ class MatriculaApp:
                 self.st.dataframe(matriculas)
 
     def exibir_cancelar_matricula(self):
+        print("APP MATRICULA clicou em exibir_cancelar_matricula")
+
         codigo_disciplina = self.st.session_state.cancelar_matricula_codigo_disciplina
         cpf_aluno = self.st.session_state.cancelar_matricula_cpf_aluno
 
         self.st.session_state.cancelar_matricula_codigo_disciplina_aoconfirmar = codigo_disciplina
         self.st.session_state.cancelar_matricula_cpf_aluno_aoconfirmar = cpf_aluno
+        self.st.session_state.exibir_cancelar_matricula = False
 
         matricula = self.matricula_db.obter_por(codigo_disciplina, cpf_aluno)
 
@@ -298,7 +337,7 @@ class MatriculaApp:
             self.st.subheader("📝🎓 Matricula | Cancelar")
             self.st.button("voltar",
                            help="não **cancelar** a Matricula e voltar para a listagem de Matriculas",
-                           on_click=self.clicou_em_cancelar_matricula_voltar)
+                           on_click=self.cancelar_matricula_voltar)
             self.st.write(
                 f"Você está prestes a **CANCELAR** a Matricula abaixo")
 

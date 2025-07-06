@@ -1,4 +1,6 @@
-from datetime import datetime
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 from banco.disciplina_db import DisciplinaDB
 from tipo.disciplina import Disciplina
 
@@ -9,6 +11,16 @@ class DisciplinaApp:
         self.st = st
         self.placeholder = placeholder
         self.disciplina_db = disciplina_db
+
+        if not "excluir_disciplina_erro" in self.st.session_state:
+            self.st.session_state.excluir_disciplina_erro = None
+        if not "excluir_disciplina_mensagem" in self.st.session_state:
+            self.st.session_state.excluir_disciplina_mensagem = None
+        if not "editar_disciplina_erro" in self.st.session_state:
+            self.st.session_state.editar_disciplina_erro = None
+
+        # debug de variaveis de sessao
+        # self.st.write(self.st.session_state)
 
     # NOVA DISCIPLINA
 
@@ -21,19 +33,26 @@ class DisciplinaApp:
 
     def nova_disciplina_salvar(self):
         print("APP DISCIPLINA clicou em salvar nova disciplina")
+
         nova_disciplina = self.obter_nova_disciplina()
+
         erros = nova_disciplina.validar()
-        if not erros:
-            self.st.session_state.nova_disciplina_codigo = self.disciplina_db.cadastrar(
-                nova_disciplina)
-            self.st.session_state.tela = "nova_disciplina_sucesso"
+
+        # TODO validar se jah existe uma disciplina cadastrada com o mesmo nome
         self.st.session_state.erros = erros
+
+        if not erros:
+            disciplina_codigo = self.disciplina_db.cadastrar(nova_disciplina)
+            self.st.session_state.nova_disciplina_codigo = disciplina_codigo
+            self.st.session_state.tela = "nova_disciplina_sucesso"
 
     # EDITAR DISCIPLINA
 
     def editar_disciplina_salvar(self):
-        print("APP DISCIPLINA clicou em salvar editar disciplina")
+        print("APP DISCIPLINA clicou em editar_disciplina_salvar")
+
         disciplina = self.st.session_state.editar_disciplina_selecionado
+
         if self.st.session_state.editar_disciplina_nome:
             disciplina.nome = self.st.session_state.editar_disciplina_nome.upper()
         if self.st.session_state.editar_disciplina_carga_horaria:
@@ -41,8 +60,10 @@ class DisciplinaApp:
                 self.st.session_state.editar_disciplina_carga_horaria)
         if self.st.session_state.editar_disciplina_professor:
             disciplina.nome_professor = self.st.session_state.editar_disciplina_professor.upper()
+
         erros = disciplina.validar()
         self.st.session_state.erros = erros
+
         if not erros:
             self.disciplina_db.atualizar(disciplina)
             self.st.session_state.tela = "editar_disciplina_sucesso"
@@ -50,53 +71,73 @@ class DisciplinaApp:
     # EXCLUIR DISCIPLINA
 
     def excluir_disciplina(self):
-        print("APP DISCIPLINA clicou em excluir disciplina")
-        codigo = self.st.session_state.excluir_disciplina_codigo_aoconfirmar
-        if not codigo or int(codigo) <= 0:
-            self.st.session_state.excluir_disciplina_codigo_erro = "🪪 Informe um CODIGO válido para excluir uma Disciplina!"
-            return
+        print("APP DISCIPLINA clicou em excluir_disciplina")
 
-        eh_codigo_em_uso = self.disciplina_db.verificar_codigo_em_uso(codigo)
-        if not eh_codigo_em_uso:
-            self.st.session_state.excluir_disciplina_codigo_erro = "🪪 Nenhuma Disciplina encontrada com o CODIGO informado."
-            return
+        self.st.session_state.excluir_disciplina_erro = None
+        self.st.session_state.excluir_disciplina_mensagem = None
+
+        codigo_disciplina = self.st.session_state.excluir_disciplina_codigo
+        self.st.session_state.excluir_disciplina_codigo = None
 
         nome_disciplina = self.disciplina_db.obter_nome_disciplina_por_codigo(
-            int(codigo))
-        self.disciplina_db.excluir_por_codigo(int(codigo))
+            codigo_disciplina)
+        self.disciplina_db.excluir_por_codigo(codigo_disciplina)
         self.st.session_state.excluir_disciplina_mensagem = f"Disciplina **{nome_disciplina}** excluída com sucesso!"
-        self.st.session_state.tela = "listar_disciplinas"
+
+        self.ir_para_listar_disciplinas()
 
     # IR PARA TELAS
 
     def ir_para_listar_disciplinas(self):
-        self.st.session_state.editar_disciplina_codigo_erro = None
-        self.st.session_state.excluir_disciplina_codigo_erro = None
-        self.st.session_state.excluir_disciplina_codigo_aoconfirmar = None
+        print("APP DISCIPLINA ir_para_listar_disciplinas")
+
+        self.st.session_state.editar_disciplina_codigo = None
+        self.st.session_state.excluir_disciplina_codigo = None
+
         self.st.session_state.tela = "listar_disciplinas"
 
     def ir_para_nova_disciplina(self):
+        print("APP DISCIPLINA ir_para_nova_disciplina")
+
+        self.st.session_state.erros = None
+
         self.st.session_state.tela = "nova_disciplina"
 
     def ir_para_editar_disciplina(self):
-        codigo = self.st.session_state.editar_disciplina_codigo
-        eh_codigo_em_uso = self.disciplina_db.verificar_codigo_em_uso(codigo)
+        print("APP ALUNO ir_para_editar_disciplina")
+
+        self.st.session_state.erros = None
+        self.st.session_state.editar_disciplina_erro = None
+
+        codigo_disciplina = self.st.session_state.editar_disciplina_codigo
+
+        eh_codigo_em_uso = self.disciplina_db.verificar_codigo_em_uso(
+            codigo_disciplina)
         if not eh_codigo_em_uso:
-            self.st.session_state.editar_disciplina_codigo_erro = "🪪 Nenhuma Disciplina encontrada com o CODIGO informado."
+            self.st.session_state.editar_disciplina_erro = "🪪 Nenhuma Disciplina encontrada com o **CODIGO** informado!"
             return
 
-        self.st.session_state.editar_disciplina_selecionado = self.disciplina_db.obter_por_codigo(
-            codigo)
+        disciplina = self.disciplina_db.obter_por_codigo(codigo_disciplina)
+        self.st.session_state.editar_disciplina_selecionado = disciplina
+
         self.st.session_state.tela = "editar_disciplina"
 
     def ir_para_excluir_disciplina(self):
-        self.st.session_state.excluir_disciplina_codigo_confirmado = None
-        self.st.session_state.excluir_disciplina_codigo_erro = None
-        codigo = self.st.session_state.excluir_disciplina_codigo
+        print("APP DISCIPLINA ir_para_excluir_disciplina")
 
-        eh_codigo_em_uso = self.disciplina_db.verificar_codigo_em_uso(codigo)
+        self.st.session_state.excluir_disciplina_erro = None
+        self.st.session_state.excluir_disciplina_mensagem = None
+
+        codigo_disciplina = self.st.session_state.excluir_disciplina_codigo
+
+        if not codigo_disciplina or int(codigo_disciplina) <= 0:
+            self.st.session_state.excluir_disciplina_erro = "🪪 Informe um CODIGO válido para excluir uma Disciplina!"
+            return
+
+        eh_codigo_em_uso = self.disciplina_db.verificar_codigo_em_uso(
+            codigo_disciplina)
         if not eh_codigo_em_uso:
-            self.st.session_state.excluir_disciplina_codigo_erro = "🪪 Nenhuma Disciplina encontrada com o CODIGO informado."
+            self.st.session_state.excluir_disciplina_erro = "🪪 Nenhuma Disciplina encontrada com o CODIGO informado!"
             return
 
         self.st.session_state.tela = "excluir_disciplina"
@@ -104,19 +145,24 @@ class DisciplinaApp:
     # EXIBIR TELAS
 
     def exibir_nova_disciplina_sucesso(self):
+        print("APP DISCIPLINA exibir_nova_disciplina_sucesso")
+
+        nova_disciplina = self.obter_nova_disciplina()
+
         with self.placeholder.container():
             self.st.subheader("📚 Disciplina")
             self.st.button("voltar",
                            help="voltar para a listagem de Disciplinas",
                            on_click=self.ir_para_listar_disciplinas)
             self.st.success("Disciplina salvo com sucesso!", icon="💾")
-            nova_disciplina = self.obter_nova_disciplina()
             self.st.write("🪪", self.st.session_state.nova_disciplina_codigo)
             self.st.write("📘", nova_disciplina.nome, )
             self.st.write("⏳", nova_disciplina.carga_horaria)
             self.st.write("👨‍🏫", nova_disciplina.nome_professor)
 
     def exibir_nova_disciplina(self):
+        print("APP DISCIPLINA exibir_nova_disciplina")
+
         with self.placeholder.container():
             self.st.subheader("📚 Disciplina | Nova")
             # os asteriscos em help=**cancelar** aplica o estilo negrito (markdown)
@@ -145,25 +191,30 @@ class DisciplinaApp:
             self.st.button("salvar", icon="💾",
                            on_click=self.nova_disciplina_salvar)
 
-            if "erros" in self.st.session_state and self.st.session_state.erros:
+            if self.st.session_state.erros:
                 for erro in self.st.session_state.erros:
                     self.st.error(erro)
                 self.st.session_state.erros = None
 
     def exibir_editar_disciplina_sucesso(self):
+        print("APP DISCIPLINA exibir_editar_disciplina_sucesso")
+
+        disciplina = self.st.session_state.editar_disciplina_selecionado
+
         with self.placeholder.container():
             self.st.subheader("📚 Disciplina")
             self.st.button("voltar",
                            help="voltar para a listagem de Disciplinas",
                            on_click=self.ir_para_listar_disciplinas)
             self.st.success("Disciplina editado com sucesso!", icon="💾")
-            disciplina = self.st.session_state.editar_disciplina_selecionado
             self.st.subheader(f"🪪 {disciplina.codigo}")
             self.st.write("📘", disciplina.nome, )
             self.st.write("⏳", disciplina.carga_horaria)
             self.st.write("👨‍🏫", disciplina.nome_professor)
 
     def exibir_editar_disciplina(self):
+        print("APP DISCIPLINA exibir_editar_disciplina")
+
         disciplina = self.st.session_state.editar_disciplina_selecionado
 
         with self.placeholder.container():
@@ -174,6 +225,7 @@ class DisciplinaApp:
             self.st.subheader(f"🪪 {disciplina.codigo} {disciplina.nome}")
             self.st.write(
                 "Preencha somente as informações que deseja alterar e clique em **salvar**")
+
             self.st.text_input("Nome:", max_chars=200,
                                placeholder="informe o nome completo da nova Disciplina",
                                icon="📘",
@@ -192,12 +244,14 @@ class DisciplinaApp:
                            icon="💾",
                            on_click=self.editar_disciplina_salvar)
 
-            if "erros" in self.st.session_state and self.st.session_state.erros:
+            if self.st.session_state.erros:
                 for erro in self.st.session_state.erros:
                     self.st.error(erro)
                 self.st.session_state.erros = None
 
     def exibir_listar_disciplinas(self):
+        print("APP DISCIPLINA exibir_listar_disciplinas")
+
         with self.placeholder.container():
             self.st.subheader("📚 Disciplina | Lista")
             col1, col2, col3 = self.st.columns([1, 1, 2])
@@ -205,7 +259,7 @@ class DisciplinaApp:
                 self.st.button(
                     "nova disciplina", on_click=self.ir_para_nova_disciplina, icon="➕")
 
-            if "excluir_disciplina_mensagem" in self.st.session_state and self.st.session_state.excluir_disciplina_mensagem:
+            if self.st.session_state.excluir_disciplina_mensagem:
                 self.st.success(
                     self.st.session_state.excluir_disciplina_mensagem, icon="🔥")
                 self.st.session_state.excluir_disciplina_mensagem = None
@@ -237,15 +291,15 @@ class DisciplinaApp:
                         on_submit=self.ir_para_excluir_disciplina,
                         key="excluir_disciplina_codigo")
 
-                if "editar_disciplain_codigo_erro" in self.st.session_state and self.st.session_state.editar_disciplain_codigo_erro:
+                if self.st.session_state.editar_disciplina_erro:
                     self.st.error(
-                        self.st.session_state.editar_disciplina_codigo_erro)
-                    self.st.session_state.editar_disciplina_codigo_erro = None
+                        self.st.session_state.editar_disciplina_erro)
+                    self.st.session_state.editar_disciplina_erro = None
 
-                if "excluir_disciplina_codigo_erro" in self.st.session_state and self.st.session_state.excluir_disciplina_codigo_erro:
+                if self.st.session_state.excluir_disciplina_erro:
                     self.st.error(
-                        self.st.session_state.excluir_disciplina_codigo_erro)
-                    self.st.session_state.excluir_disciplina_codigo_erro = None
+                        self.st.session_state.excluir_disciplina_erro)
+                    self.st.session_state.excluir_disciplina_erro = None
 
                 self.st.write(len(disciplinas),
                               "disciplinas" if len(
@@ -255,23 +309,25 @@ class DisciplinaApp:
                 self.st.dataframe(disciplinas)
 
     def exibir_excluir_disciplina(self):
+        print("APP DISCIPLINA exibir_excluir_disciplina")
+
         codigo = self.st.session_state.excluir_disciplina_codigo
-        self.st.session_state.excluir_disciplina_codigo_aoconfirmar = codigo
-        disciplina = self.disciplina_db.obter_por_codigo(int(codigo))
+        disciplina = self.disciplina_db.obter_por_codigo(codigo)
 
         with self.placeholder.container():
             self.st.subheader("📚 Disciplina | Excluir")
             self.st.button("voltar",
                            help="**cancelar** a exclusão da Disciplina e voltar para a listagem de Disciplinas",
                            on_click=self.ir_para_listar_disciplinas)
-            if disciplina:
-                self.st.write(
-                    f"Você está prestes a excluir a Disciplina **{disciplina.nome}**")
-                self.st.write("🪪", disciplina.codigo)
-                self.st.write("⏳", disciplina.carga_horaria)
-                self.st.write("👨‍🏫", disciplina.nome_professor)
-                self.st.button("confirmar exclusão", icon="🔥",
-                               on_click=self.excluir_disciplina)
+            self.st.write(
+                f"Você está prestes a excluir a Disciplina **{disciplina.nome}**")
+
+            self.st.write("🪪", disciplina.codigo)
+            self.st.write("⏳", disciplina.carga_horaria)
+            self.st.write("👨‍🏫", disciplina.nome_professor)
+
+            self.st.button("confirmar exclusão", icon="🔥",
+                           on_click=self.excluir_disciplina)
 
     # EXIBIR PRINCIPAL
 
@@ -288,6 +344,3 @@ class DisciplinaApp:
             self.exibir_excluir_disciplina()
         else:  # listar_disciplinas
             self.exibir_listar_disciplinas()
-
-        # debug de variaveis de sessao
-        # self.st.write(self.st.session_state)

@@ -1,3 +1,6 @@
+# Projeto: Sistema de Controle Acadêmico
+# Desenvolvedor: Jefferson Gonçalves Andrade
+
 from datetime import datetime
 from util import eh_cpf_valido
 
@@ -6,21 +9,12 @@ class Aluno:
     """ Classe que representa um Aluno """
 
     def __init__(self, cpf, nome, ano_nascimento, email, endereco):
-        self.cpf = 0
-        self.ano_nascimento = 0
-        self.idade = 0
-
-        if cpf:
-            self.cpf = int(cpf)
-        if ano_nascimento:
-            self.ano_nascimento = int(ano_nascimento)
-            # SE o ano de nascimento for informado,
-            # calcula a idade do aluno
-            self.idade = datetime.now().year - self.ano_nascimento
-
-        self.nome = nome.upper()
-        self.email = email.upper()
-        self.endereco = endereco.upper()
+        self.cpf = int(cpf) if cpf else None
+        self.nome = nome.upper() if nome else None
+        self.ano_nascimento = int(ano_nascimento) if ano_nascimento else 0
+        self.idade = datetime.now().year - self.ano_nascimento
+        self.email = email.upper() if email else None
+        self.endereco = endereco.upper() if endereco else None
 
     def validar(self):
         """ valida as informacoes do aluno e retorna os erros encontrados """
