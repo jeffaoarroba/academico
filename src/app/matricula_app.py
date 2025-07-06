@@ -175,9 +175,19 @@ class MatriculaApp:
 
         with self.placeholder.container():
             self.st.subheader("📝🎓 Matricula")
-            self.st.button("voltar",
-                           help="voltar para a listagem de matriculas",
-                           on_click=self.ir_para_listar_matriculas)
+
+            col1, col2 = self.st.columns([1, 2])
+
+            with col1:
+                self.st.button("voltar",
+                               help="voltar para a listagem de matriculas",
+                               on_click=self.ir_para_listar_matriculas)
+            with col2:
+                self.st.button("nova matricula",
+                               help="cadastrar uma nova Matricula",
+                               icon="➕",
+                               on_click=self.ir_para_nova_matricula)
+
             self.st.success("Matricula salvo com sucesso!", icon="💾")
             self.st.write("**DISCIPLINA**")
             self.st.write("📘", nova_matricula.nome_disciplina, )

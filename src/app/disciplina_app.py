@@ -20,7 +20,7 @@ class DisciplinaApp:
             self.st.session_state.editar_disciplina_erro = None
 
         # debug de variaveis de sessao
-        self.st.write(self.st.session_state)
+        # self.st.write(self.st.session_state)
 
     # NOVA DISCIPLINA
 
@@ -152,9 +152,19 @@ class DisciplinaApp:
 
         with self.placeholder.container():
             self.st.subheader("📚 Disciplina")
-            self.st.button("voltar",
-                           help="voltar para a listagem de Disciplinas",
-                           on_click=self.ir_para_listar_disciplinas)
+
+            col1, col2 = self.st.columns([1, 2])
+
+            with col1:
+                self.st.button("voltar",
+                               help="voltar para a listagem de Disciplinas",
+                               on_click=self.ir_para_listar_disciplinas)
+            with col2:
+                self.st.button("novo disciplina",
+                               help="cadastrar uma nova Disciplina",
+                               icon="➕",
+                               on_click=self.ir_para_novo_disciplina)
+
             self.st.success("Disciplina salvo com sucesso!", icon="💾")
             self.st.write("🪪", self.st.session_state.nova_disciplina_codigo)
             self.st.write("📘", nova_disciplina.nome, )
