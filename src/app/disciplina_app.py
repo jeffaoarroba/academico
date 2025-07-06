@@ -20,7 +20,7 @@ class DisciplinaApp:
             self.st.session_state.editar_disciplina_erro = None
 
         # debug de variaveis de sessao
-        # self.st.write(self.st.session_state)
+        self.st.write(self.st.session_state)
 
     # NOVA DISCIPLINA
 
@@ -76,8 +76,8 @@ class DisciplinaApp:
         self.st.session_state.excluir_disciplina_erro = None
         self.st.session_state.excluir_disciplina_mensagem = None
 
-        codigo_disciplina = self.st.session_state.excluir_disciplina_codigo
-        self.st.session_state.excluir_disciplina_codigo = None
+        codigo_disciplina = self.st.session_state.excluir_disciplina_codigo_aoconfirmar
+        self.st.session_state.excluir_disciplina_codigo_aoconfirmar = None
 
         nome_disciplina = self.disciplina_db.obter_nome_disciplina_por_codigo(
             codigo_disciplina)
@@ -129,6 +129,7 @@ class DisciplinaApp:
         self.st.session_state.excluir_disciplina_mensagem = None
 
         codigo_disciplina = self.st.session_state.excluir_disciplina_codigo
+        self.st.session_state.excluir_disciplina_codigo_aoconfirmar = codigo_disciplina
 
         if not codigo_disciplina or int(codigo_disciplina) <= 0:
             self.st.session_state.excluir_disciplina_erro = "🪪 Informe um CODIGO válido para excluir uma Disciplina!"
