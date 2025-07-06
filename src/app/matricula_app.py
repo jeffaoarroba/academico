@@ -179,7 +179,7 @@ class MatriculaApp:
                            help="voltar para a listagem de matriculas",
                            on_click=self.ir_para_listar_matriculas)
             self.st.success("Matricula salvo com sucesso!", icon="💾")
-            self.st.write("**MATRICULA**")
+            self.st.write("**DISCIPLINA**")
             self.st.write("📘", nova_matricula.nome_disciplina, )
             self.st.write("👨‍🏫", nova_matricula.nome_professor_disciplina)
             self.st.write("**ALUNO**")
